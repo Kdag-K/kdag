@@ -1,8 +1,9 @@
 package commands
 
 import (
+	"path/filepath"
+
 	"github.com/mosaicnetworks/babble/src/babble"
-	"github.com/mosaicnetworks/babble/src/proxy/dummy"
 	aproxy "github.com/mosaicnetworks/babble/src/proxy/socket/app"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -14,7 +15,7 @@ func NewRunCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "run",
 		Short:   "Run node",
-		PreRunE: loadConfig,
+		PreRunE: bindFlagsLoadViper,
 		RunE:    runBabble,
 	}
 	AddRunFlags(cmd)
@@ -26,30 +27,30 @@ func NewRunCmd() *cobra.Command {
 *******************************************************************************/
 
 func runBabble(cmd *cobra.Command, args []string) error {
-	if !config.Standalone {
-		p, err := aproxy.NewSocketAppProxy(
-			config.ClientAddr,
-			config.ProxyAddr,
-			config.Babble.NodeConfig.HeartbeatTimeout,
-			config.Babble.Logger,
-		)
 
-		if err != nil {
-			config.Babble.Logger.Error("Cannot initialize socket AppProxy:", err)
-			return err
-		}
+	_config.Babble.Logger().WithFields(logrus.Fields{
+		"ProxyAddr":  _config.ProxyAddr,
+		"ClientAddr": _config.ClientAddr,
+	}).Debug("Config Proxy")
 
-		config.Babble.Proxy = p
-	} else {
-		p := dummy.NewInmemDummyClient(config.Babble.Logger)
+	p, err := aproxy.NewSocketAppProxy(
+		_config.ClientAddr,
+		_config.ProxyAddr,
+		_config.Babble.HeartbeatTimeout,
+		_config.Babble.Logger(),
+	)
 
-		config.Babble.Proxy = p
+	if err != nil {
+		_config.Babble.Logger().Error("Cannot initialize socket AppProxy:", err)
+		return err
 	}
 
-	engine := babble.NewBabble(&config.Babble)
+	_config.Babble.Proxy = p
+
+	engine := babble.NewBabble(&_config.Babble)
 
 	if err := engine.Init(); err != nil {
-		config.Babble.Logger.Error("Cannot initialize engine:", err)
+		_config.Babble.Logger().Error("Cannot initialize engine:", err)
 		return err
 	}
 
@@ -65,97 +66,68 @@ func runBabble(cmd *cobra.Command, args []string) error {
 //AddRunFlags adds flags to the Run command
 func AddRunFlags(cmd *cobra.Command) {
 
-	cmd.Flags().String("datadir", config.Babble.DataDir, "Top-level directory for configuration and data")
-	cmd.Flags().String("log", config.Babble.LogLevel, "debug, info, warn, error, fatal, panic")
+	cmd.Flags().String("datadir", _config.Babble.DataDir, "Top-level directory for configuration and data")
+	cmd.Flags().String("log", _config.Babble.LogLevel, "debug, info, warn, error, fatal, panic")
+	cmd.Flags().String("moniker", _config.Babble.Moniker, "Optional name")
+	cmd.Flags().BoolP("maintenance-mode", "R", _config.Babble.MaintenanceMode, "Start Babble in a suspended (non-gossipping) state")
 
 	// Network
-	cmd.Flags().StringP("listen", "l", config.Babble.BindAddr, "Listen IP:Port for babble node")
-	cmd.Flags().DurationP("timeout", "t", config.Babble.NodeConfig.TCPTimeout, "TCP Timeout")
-	cmd.Flags().Int("max-pool", config.Babble.MaxPool, "Connection pool size max")
+	cmd.Flags().StringP("listen", "l", _config.Babble.BindAddr, "Listen IP:Port for babble node")
+	cmd.Flags().StringP("advertise", "a", _config.Babble.AdvertiseAddr, "Advertise IP:Port for babble node")
+	cmd.Flags().DurationP("timeout", "t", _config.Babble.TCPTimeout, "TCP Timeout")
+	cmd.Flags().DurationP("join-timeout", "j", _config.Babble.JoinTimeout, "Join Timeout")
+	cmd.Flags().Int("max-pool", _config.Babble.MaxPool, "Connection pool size max")
 
 	// Proxy
-	cmd.Flags().Bool("standalone", config.Standalone, "Do not create a proxy")
-	cmd.Flags().StringP("proxy-listen", "p", config.ProxyAddr, "Listen IP:Port for babble proxy")
-	cmd.Flags().StringP("client-connect", "c", config.ClientAddr, "IP:Port to connect to client")
+	cmd.Flags().StringP("proxy-listen", "p", _config.ProxyAddr, "Listen IP:Port for babble proxy")
+	cmd.Flags().StringP("client-connect", "c", _config.ClientAddr, "IP:Port to connect to client")
 
 	// Service
-	cmd.Flags().StringP("service-listen", "s", config.Babble.ServiceAddr, "Listen IP:Port for HTTP service")
+	cmd.Flags().Bool("no-service", _config.Babble.NoService, "Disable HTTP service")
+	cmd.Flags().StringP("service-listen", "s", _config.Babble.ServiceAddr, "Listen IP:Port for HTTP service")
 
 	// Store
-	cmd.Flags().Bool("store", config.Babble.Store, "Use badgerDB instead of in-mem DB")
-	cmd.Flags().Int("cache-size", config.Babble.NodeConfig.CacheSize, "Number of items in LRU caches")
+	cmd.Flags().Bool("store", _config.Babble.Store, "Use badgerDB instead of in-mem DB")
+	cmd.Flags().String("db", _config.Babble.DatabaseDir, "Dabatabase directory")
+	cmd.Flags().Bool("bootstrap", _config.Babble.Bootstrap, "Load from database")
+	cmd.Flags().Int("cache-size", _config.Babble.CacheSize, "Number of items in LRU caches")
 
 	// Node configuration
-	cmd.Flags().Duration("heartbeat", config.Babble.NodeConfig.HeartbeatTimeout, "Time between gossips")
-	cmd.Flags().Int("sync-limit", config.Babble.NodeConfig.SyncLimit, "Max number of events for sync")
+	cmd.Flags().Duration("heartbeat", _config.Babble.HeartbeatTimeout, "Timer frequency when there is something to gossip about")
+	cmd.Flags().Duration("slow-heartbeat", _config.Babble.SlowHeartbeatTimeout, "Timer frequency when there is nothing to gossip about")
+	cmd.Flags().Int("sync-limit", _config.Babble.SyncLimit, "Max number of events for sync")
+	cmd.Flags().Bool("fast-sync", _config.Babble.EnableFastSync, "Enable FastSync")
+	cmd.Flags().Int("suspend-limit", _config.Babble.SuspendLimit, "Limit of undetermined events before entering suspended state")
 }
 
-func loadConfig(cmd *cobra.Command, args []string) error {
-
-	err := bindFlagsLoadViper(cmd)
-	if err != nil {
-		return err
-	}
-
-	config, err = parseConfig()
-	if err != nil {
-		return err
-	}
-
-	config.Babble.Logger.Level = babble.LogLevel(config.Babble.LogLevel)
-	config.Babble.NodeConfig.Logger = config.Babble.Logger
-
-	config.Babble.Logger.WithFields(logrus.Fields{
-		"babble.DataDir":               config.Babble.DataDir,
-		"babble.BindAddr":              config.Babble.BindAddr,
-		"babble.ServiceAddr":           config.Babble.ServiceAddr,
-		"babble.MaxPool":               config.Babble.MaxPool,
-		"babble.Store":                 config.Babble.Store,
-		"babble.LoadPeers":             config.Babble.LoadPeers,
-		"babble.LogLevel":              config.Babble.LogLevel,
-		"babble.Node.HeartbeatTimeout": config.Babble.NodeConfig.HeartbeatTimeout,
-		"babble.Node.TCPTimeout":       config.Babble.NodeConfig.TCPTimeout,
-		"babble.node.CacheSize":        config.Babble.NodeConfig.CacheSize,
-		"babble.node.SyncLimit":        config.Babble.NodeConfig.SyncLimit,
-		"ProxyAddr":                    config.ProxyAddr,
-		"ClientAddr":                   config.ClientAddr,
-		"Standalone":                   config.Standalone,
-	}).Debug("RUN")
-
-	return nil
-}
-
-//Bind all flags and read the config into viper
-func bindFlagsLoadViper(cmd *cobra.Command) error {
-	// cmd.Flags() includes flags from this command and all persistent flags from the parent
+// Bind all flags and read the config into viper
+func bindFlagsLoadViper(cmd *cobra.Command, args []string) error {
+	// Register flags with viper. Include flags from this command and all other
+	// persistent flags from the parent
 	if err := viper.BindPFlags(cmd.Flags()); err != nil {
 		return err
 	}
 
-	viper.SetConfigName("babble")              // name of config file (without extension)
-	viper.AddConfigPath(config.Babble.DataDir) // search root directory
-	// viper.AddConfigPath(filepath.Join(config.Babble.DataDir, "babble")) // search root directory /config
+	// first unmarshal to read from CLI flags
+	if err := viper.Unmarshal(_config); err != nil {
+		return err
+	}
+
+	// look for config file in [datadir]/babble.toml (.json, .yaml also work)
+	viper.SetConfigName("babble")               // name of config file (without extension)
+	viper.AddConfigPath(_config.Babble.DataDir) // search root directory
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		config.Babble.Logger.Debugf("Using config file: %s", viper.ConfigFileUsed())
+		_config.Babble.Logger().Debugf("Using config file: %s", viper.ConfigFileUsed())
 	} else if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-		config.Babble.Logger.Debugf("No config file found in: %s", config.Babble.DataDir)
+		_config.Babble.Logger().Debugf("No config file found in: %s", filepath.Join(_config.Babble.DataDir, "babble.toml"))
 	} else {
 		return err
 	}
 
-	return nil
-}
-
-//Retrieve the default environment configuration.
-func parseConfig() (*CLIConfig, error) {
-	conf := NewDefaultCLIConfig()
-	err := viper.Unmarshal(conf)
-	if err != nil {
-		return nil, err
-	}
-	return conf, err
+	// second unmarshal to read from config file
+	return viper.Unmarshal(_config)
 }
 
 func logLevel(l string) logrus.Level {
