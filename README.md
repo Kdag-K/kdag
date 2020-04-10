@@ -152,13 +152,13 @@ CLI tool for managing Go code. Go is very opinionated and will require you to
 go code will reside.
 
 ### Babble and dependencies
-Clone the [repository](https://github.com/mosaicnetworks/babble) in the appropriate 
+Clone the [repository](https://github.com/Kdag-K/babble) in the appropriate 
 GOPATH subdirectory:
 
 ```bash
-$ mkdir -p $GOPATH/src/github.com/mosaicnetworks/
-$ cd $GOPATH/src/github.com/mosaicnetworks
-[...]/mosaicnetworks$ git clone https://github.com/mosaicnetworks/babble.git
+$ mkdir -p $GOPATH/src/github.com/Kdag-K/
+$ cd $GOPATH/src/github.com/Kdag-K
+[...]/mosaicnetworks$ git clone https://github.com/Kdag-K/babble.git
 ```
 Babble uses [Glide](http://github.com/Masterminds/glide) to manage dependencies.
 
