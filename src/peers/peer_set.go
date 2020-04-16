@@ -147,7 +147,27 @@ func (peerSet *PeerSet) Marshal() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+//SuperMajority return the number of peers that forms a strong majortiy (+2/3)
+//in the PeerSet
+func (peerSet *PeerSet) SuperMajority() int {
+	if peerSet.superMajority == nil {
+		val := 2*peerSet.Len()/3 + 1
+		peerSet.superMajority = &val
+	}
+	return *peerSet.superMajority
+}
 
+//TrustCount calculates the Trust Count for a peerset
+func (peerSet *PeerSet) TrustCount() int {
+	if peerSet.trustCount == nil {
+		val := 0
+		if len(peerSet.Peers) > 1 {
+			val = int(math.Ceil(float64(peerSet.Len()) / float64(3)))
+		}
+		peerSet.trustCount = &val
+	}
+	return *peerSet.trustCount
+}
 
 func (peerSet *PeerSet) clearCache() {
 	peerSet.hash = []byte{}
