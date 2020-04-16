@@ -152,13 +152,13 @@ CLI tool for managing Go code. Go is very opinionated and will require you to
 go code will reside.
 
 ### Babble and dependencies
-Clone the [repository](https://github.com/mosaicnetworks/babble) in the appropriate 
+Clone the [repository](https://github.com/Kdag-K/babble) in the appropriate 
 GOPATH subdirectory:
 
 ```bash
-$ mkdir -p $GOPATH/src/github.com/mosaicnetworks/
-$ cd $GOPATH/src/github.com/mosaicnetworks
-[...]/mosaicnetworks$ git clone https://github.com/mosaicnetworks/babble.git
+$ mkdir -p $GOPATH/src/github.com/Kdag-K/
+$ cd $GOPATH/src/github.com/Kdag-K
+[...]/mosaicnetworks$ git clone https://github.com/Kdag-K/babble.git
 ```
 Babble uses [Glide](http://github.com/Masterminds/glide) to manage dependencies.
 
@@ -177,139 +177,4 @@ example for macos:
 ```
 # --with-default-names makes the `sed` and `awk` commands default to gnu sed and gnu awk respectively.
 brew install gnu-sed gawk --with-default-names
-```
-
-### Testing
-
-Babble has extensive unit-testing. Use the Go tool to run tests:
-```bash
-[...]/babble$ make test
-```
-
-If everything goes well, it should output something along these lines:
-```
-?       github.com/mosaicnetworks/babble/src/babble     [no test files]
-ok      github.com/mosaicnetworks/babble/src/common     0.015s
-ok      github.com/mosaicnetworks/babble/src/crypto     0.122s
-ok      github.com/mosaicnetworks/babble/src/hashgraph  10.270s
-?       github.com/mosaicnetworks/babble/src/mobile     [no test files]
-ok      github.com/mosaicnetworks/babble/src/net        0.012s
-ok      github.com/mosaicnetworks/babble/src/node       19.171s
-ok      github.com/mosaicnetworks/babble/src/peers      0.038s
-?       github.com/mosaicnetworks/babble/src/proxy      [no test files]
-ok      github.com/mosaicnetworks/babble/src/proxy/dummy        0.013s
-ok      github.com/mosaicnetworks/babble/src/proxy/inmem        0.037s
-ok      github.com/mosaicnetworks/babble/src/proxy/socket       0.009s
-?       github.com/mosaicnetworks/babble/src/proxy/socket/app   [no test files]
-?       github.com/mosaicnetworks/babble/src/proxy/socket/babble        [no test files]
-?       github.com/mosaicnetworks/babble/src/service    [no test files]
-?       github.com/mosaicnetworks/babble/src/version    [no test files]
-?       github.com/mosaicnetworks/babble/cmd/babble     [no test files]
-?       github.com/mosaicnetworks/babble/cmd/babble/commands    [no test files]
-?       github.com/mosaicnetworks/babble/cmd/dummy      [no test files]
-?       github.com/mosaicnetworks/babble/cmd/dummy/commands     [no test files]
-
-```
-
-## Build from source
-
-The easiest way to build binaries is to do so in a hermetic Docker container. 
-Use this simple command:
-
-```bash
-[...]/babble$ make dist
-```
-This will launch the build in a Docker container and write all the artifacts in
-the build/ folder.
-
-```bash
-[...]/babble$ tree build
-build/
-├── dist
-│   ├── babble_0.1.0_darwin_386.zip
-│   ├── babble_0.1.0_darwin_amd64.zip
-│   ├── babble_0.1.0_freebsd_386.zip
-│   ├── babble_0.1.0_freebsd_arm.zip
-│   ├── babble_0.1.0_linux_386.zip
-│   ├── babble_0.1.0_linux_amd64.zip
-│   ├── babble_0.1.0_linux_arm.zip
-│   ├── babble_0.1.0_SHA256SUMS
-│   ├── babble_0.1.0_windows_386.zip
-│   └── babble_0.1.0_windows_amd64.zip
-└── pkg
-    ├── darwin_386
-    │   └── babble
-    ├── darwin_amd64
-    │   └── babble
-    ├── freebsd_386
-    │   └── babble
-    ├── freebsd_arm
-    │   └── babble
-    ├── linux_386
-    │   └── babble
-    ├── linux_amd64
-    │   └── babble
-    ├── linux_arm
-    │   └── babble
-    ├── windows_386
-    │   └── babble.exe
-    └── windows_amd64
-        └── babble.exe
-```
-
-## Demo
-
-To see Babble in action, we have provided a series of scripts to bootstrap a 
-test network locally.
-
-**NOTE:**
-This has been tested on Ubuntu 16.04 and macOS.
-
-Make sure you have [Docker](https://docker.com) installed.
-
-Then, run the testnet:
-
-```bash
-[...]/babble$ cd demo
-[...]/babble/demo$ make
-```
-
-Once the testnet is started, a script is automatically launched to monitor 
-consensus figures:
-
-```
-consensus_events:180 consensus_transactions:40 events_per_second:0.00 id:1 last_block_index:3 last_consensus_round:17 num_peers:3 round_events:7 rounds_per_second:0.00 state:Babbling sync_rate:1.00 transaction_pool:0 undetermined_events:18
-consensus_events:180 consensus_transactions:40 events_per_second:0.00 id:3 last_block_index:3 last_consensus_round:17 num_peers:3 round_events:7 rounds_per_second:0.00 state:Babbling sync_rate:1.00 transaction_pool:0 undetermined_events:20
-consensus_events:180 consensus_transactions:40 events_per_second:0.00 id:2 last_block_index:3 last_consensus_round:17 num_peers:3 round_events:7 rounds_per_second:0.00 state:Babbling sync_rate:1.00 transaction_pool:0 undetermined_events:21
-consensus_events:180 consensus_transactions:40 events_per_second:0.00 id:0 last_block_index:3 last_consensus_round:17 num_peers:3 round_events:7 rounds_per_second:0.00 state:Babbling sync_rate:1.00 transaction_pool:0 undetermined_events:20
-```
-
-Running ```docker ps -a``` will show you that 9 docker containers have been launched:
-```
-[...]/babble/demo$ docker ps -a
-CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS              PORTS                   NAMES
-ba80ef275f22        mosaicnetworks/watcher   "/watch.sh"              48 seconds ago      Up 7 seconds                                watcher
-4620ed62a67d        mosaicnetworks/dummy     "dummy '--name=client"   49 seconds ago      Up 48 seconds       1339/tcp                client4
-847ea77bd7fc        mosaicnetworks/babble    "babble run --cache_s"   50 seconds ago      Up 49 seconds       80/tcp, 1337-1338/tcp   node4
-11df03bf9690        mosaicnetworks/dummy     "dummy '--name=client"   51 seconds ago      Up 50 seconds       1339/tcp                client3
-00af002747ca        mosaicnetworks/babble    "babble run --cache_s"   52 seconds ago      Up 50 seconds       80/tcp, 1337-1338/tcp   node3
-b2011d3d65bb        mosaicnetworks/dummy     "dummy '--name=client"   53 seconds ago      Up 51 seconds       1339/tcp                client2
-e953b50bc1db        mosaicnetworks/babble    "babble run --cache_s"   53 seconds ago      Up 52 seconds       80/tcp, 1337-1338/tcp   node2
-0c9dd65de193        mosaicnetworks/dummy     "dummy '--name=client"   54 seconds ago      Up 53 seconds       1339/tcp                client1
-d1f4e5008d4d        mosaicnetworks/babble    "babble run --cache_s"   55 seconds ago      Up 54 seconds       80/tcp, 1337-1338/tcp   node1
-```
-Indeed, each node is comprised of an App and a Babble node (cf Design section).
-
-Run the **demo** script to play with the **Dummy App** which is a simple chat 
-application powered by the Babble consensus platform:
-
-```
-[...]/babble/demo$ make demo
-```
-![Demo](demo/img/demo.png)
-
-
-Finally, stop the testnet:
-```
-[...]/babble/demo$ make stop
 ```
