@@ -56,5 +56,9 @@ func (c *ControlTimer) Run(init time.Duration) {
 
 //Shutdown shuts down the ControlTimer
 func (c *ControlTimer) Shutdown() {
-
+	if !c.shutdown {
+		close(c.shutdownCh)
+		c.shutdown = true
+	}
+	return
 }
