@@ -51,7 +51,22 @@ func (c *ControlTimer) Run(init time.Duration) {
 		return c.timerFactory(t)
 	}
 
-
+	timer := setTimer(init)
+	for {
+		select {
+		case <-timer:
+			c.tickCh <- struct{}{}
+			c.set = false
+		case t := <-c.resetCh:
+			timer = setTimer(t)
+		case <-c.stopCh:
+			timer = nil
+			c.set = false
+		case <-c.shutdownCh:
+			c.set = false
+			return
+		}
+	}
 }
 
 //Shutdown shuts down the ControlTimer
