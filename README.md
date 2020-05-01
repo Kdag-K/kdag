@@ -1,16 +1,16 @@
-# BABBLE
+# KDAG
 ## BFT Consensus platform for distributed applications.
 
 [![CircleCI](https://circleci.com/gh/mosaicnetworks/babble.svg?style=svg)](https://circleci.com/gh/mosaicnetworks/babble)
 
-Babble allows many computers to behave as one. It uses Peer to Peer (P2P) 
+Kdag allows many computers to behave as one. It uses Peer to Peer (P2P) 
 networking and a consensus algorithm to guarantee that multiple connected 
 computers process the same commands in the same order; a technique known as 
 state machine replication. This makes for secure systems that can tolerate 
 arbitrary failures including malicious behavior.
 
-For guidance on how to install and use Babble please visit our 
-[documentation](http://docs.babble.io) pages.
+For guidance on how to install and use kdag please visit our 
+[documentation](http://docs.kdag.io) pages.
 
 **NOTE**:
 This is alpha software. Please contact us if you intend to run it in production.
@@ -31,21 +31,21 @@ the theoretical limit of tolerating up to one-third of faulty nodes without
 compromising on speed. For those familiar with the jargon, it is a leaderless, 
 asynchronous BFT consensus algorithm.
 
-Babble projects the output of the consensus algorithm onto a linear blockchain 
+Kdag projects the output of the consensus algorithm onto a linear blockchain 
 which is more suitable for representing an ordered list of transactions and 
 facilitates the creation of light-clients. For information about this projection
-please refer to [documentation](http://docs.babble.io/blockchain.html) pages.
+please refer to [documentation](http://docs.kdag.io/blockchain.html) pages.
 
 ## Design
 
-Babble is designed to integrate with applications written in any programming 
+Kdag is designed to integrate with applications written in any programming 
 language.
 
 ### Overview
 
 ```
     +--------------------------------------+
-    | APP                                  |
+    | Client App                                  |
     |                                      |
     |  +-------------+     +------------+  | 
     |  | Service     | <-- | State      |  |
@@ -58,10 +58,10 @@ language.
 --------- SubmitTx(tx) ---- CommitBlock(Block) ------- JSON-RPC/TCP or in-memory       
                |                |                         
  +-------------|----------------|------------------------------+
- | BABBLE      |                |                              |
+ | KDAG      |                |                              |
  |             v                |                              |
  |          +----------------------+                           |
- |          | App Proxy            |                           |
+ |          | App Gateway            |                           |
  |          |                      |                           |
  |          +----------------------+                           |
  |                     |                                       |
@@ -78,7 +78,7 @@ language.
  |   +-------------------------------------+                   |
  |                     |                                       |
  |   +-------------------------------------+                   |
- |   | Transport                           |                   |
+ |   | Edge interface                      |                   |
  |   |                                     |                   |
  |   +-------------------------------------+                   |
  |                     ^                                       |
@@ -101,28 +101,28 @@ read-only requests), but forwards commands to a *transaction ordering system*
 which takes care of broadcasting and ordering the transactions across all 
 replicas before feeding them back to the application's *state*. 
 
-Babble is an ordering system that plugs into any application thanks to a very 
+Kdag is an ordering system that plugs into any application thanks to a very 
 simple interface. It uses a consensus algorithm, to replicate and order the 
 transactions, and a blockchain to represent the resulting list. A blockchain is 
 a linear data structure composed of batches of transactions, hashed and signed 
 together, easily allowing to verify any transaction. So, instead of applying 
-commands directly to the *state*, Babble applications must forward the commands 
-to Babble and let them be processed asynchronously by the consensus system 
+commands directly to the *state*, Kdag applications must forward the commands 
+to Kdag and let them be processed asynchronously by the consensus system 
 before receiving them back, in blocks, ready to be applied to the *state*.  
 
 ### API
 
-Babble communicates with the App through an `AppProxy` interface, which has two
+Kdag communicates with the App through an `AppProxy` interface, which has two
 implementations:
 
 - `SocketProxy`: A SocketProxy connects to an App via TCP sockets. It enables 
                  the application to run in a separate process or machine, and to 
                  be written in any programming language.
 
-- `InmemProxy` : An InmemProxy uses native callback handlers to integrate Babble 
+- `InmemProxy` : An InmemProxy uses native callback handlers to integrate Kdag 
                  as a regular Go dependency. 
 
-The `AppProxy` interface exposes three methods for Babble to call the App:
+The `AppProxy` interface exposes three methods for Kdag to call the App:
 
 - `CommitBlock(Block) ([]byte, error)`: Commits a block to the application and 
                                         returns the resulting state hash.
@@ -130,41 +130,41 @@ The `AppProxy` interface exposes three methods for Babble to call the App:
                                       corresponding to a particular block index.
 - `Restore([]byte) error`: Restores the App state from a snapshot.
 
-Reciprocally, `AppProxy` relays transactions from the App to Babble via a native 
+Reciprocally, `AppProxy` relays transactions from the App to Kdag via a native 
 Go channel - `SubmitCh` - which ties into the application differently depending 
 on the type of proxy (Socket or Inmem).
 
-Babble asynchronously processes transactions and eventually feeds them back to 
+kdag asynchronously processes transactions and eventually feeds them back to 
 the App, in consensus order and bundled into blocks, with a **CommitBlock** 
-call. Transactions are just raw bytes and Babble does not need to know what they 
+call. Transactions are just raw bytes and Kdag does not need to know what they 
 represent. Therefore, encoding and decoding transactions is done by the App.
 
-Refer to the [API documentation](http://docs.babble.io/latest/api.html) for more 
+Refer to the [API documentation](http://docs.kdag.io/latest/api.html) for more 
 details and a quick-start guide.
 
 ## Dev
 
 ### Go
-Babble is written in [Golang](https://golang.org/). Hence, the first step is to 
+Kdag is written in [Golang](https://golang.org/). Hence, the first step is to 
 install **Go version 1.9 or above** which is both the programming language and a 
 CLI tool for managing Go code. Go is very opinionated and will require you to 
 [define a workspace](https://golang.org/doc/code.html#Workspaces) where all your 
 go code will reside.
 
-### Babble and dependencies
-Clone the [repository](https://github.com/Kdag-K/babble) in the appropriate 
+### Kdag and dependencies
+Clone the [repository](https://github.com/Kdag-K/kdag) in the appropriate 
 GOPATH subdirectory:
 
 ```bash
 $ mkdir -p $GOPATH/src/github.com/Kdag-K/
 $ cd $GOPATH/src/github.com/Kdag-K
-[...]/mosaicnetworks$ git clone https://github.com/Kdag-K/babble.git
+[...]/mosaicnetworks$ git clone https://github.com/Kdag-K/kdag.git
 ```
-Babble uses [Glide](http://github.com/Masterminds/glide) to manage dependencies.
+Kdag uses [Glide](http://github.com/Masterminds/glide) to manage dependencies.
 
 ```bash
-[...]/babble$ curl https://glide.sh/get | sh
-[...]/babble$ glide install
+[...]/kdag$ curl https://glide.sh/get | sh
+[...]/kdag$ glide install
 ```
 This will download all dependencies and put them in the **vendor** folder.
 
