@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"math"
 
-	"github.com/mosaicnetworks/babble/src/common"
-	"github.com/mosaicnetworks/babble/src/crypto"
+	"github.com/kdag/src/common"
+	"github.com/kdag/src/crypto"
 )
 
 //PeerSet is a set of Peers forming a consensus network

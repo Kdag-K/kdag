@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/mosaicnetworks/babble/src/common"
-	"github.com/mosaicnetworks/babble/src/crypto/keys"
+	"github.com/kdag/src/common"
+	"github.com/kdag/src/crypto/keys"
 )
 
 // Peer is a struct that holds Peer data
