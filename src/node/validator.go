@@ -3,7 +3,7 @@ package node
 import (
 	"crypto/ecdsa"
 
-	"github.com/mosaicnetworks/babble/src/crypto/keys"
+	"github.com/kdag/src/crypto/keys"
 )
 
 //Validator struct holds information about the validator for a node
