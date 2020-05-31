@@ -1,6 +1,6 @@
 package hashgraph
 
-import "github.com/mosaicnetworks/babble/src/peers"
+import "github.com/kdag/src/peers"
 
 // Store ...
 type Store interface {

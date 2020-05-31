@@ -3,8 +3,8 @@ package hashgraph
 import (
 	"testing"
 
-	"github.com/mosaicnetworks/babble/src/crypto/keys"
-	"github.com/mosaicnetworks/babble/src/peers"
+	"github.com/kdag/src/crypto/keys"
+	"github.com/kdag/src/peers"
 )
 
 func createTestBlock() *Block {

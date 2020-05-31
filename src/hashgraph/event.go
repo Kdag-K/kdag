@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mosaicnetworks/babble/src/common"
-	"github.com/mosaicnetworks/babble/src/crypto"
-	"github.com/mosaicnetworks/babble/src/crypto/keys"
+	"github.com/kdag/src/common"
+	"github.com/kdag/src/crypto"
+	"github.com/kdag/src/crypto/keys"
 )
 
 /*******************************************************************************
