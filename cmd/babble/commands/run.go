@@ -3,8 +3,8 @@ package commands
 import (
 	"path/filepath"
 
-	"github.com/mosaicnetworks/babble/src/babble"
-	aproxy "github.com/mosaicnetworks/babble/src/proxy/socket/app"
+	"github.com/kdag/src/babble"
+	aproxy "github.com/kdag/src/proxy/socket/app"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
