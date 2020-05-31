@@ -5,13 +5,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/mosaicnetworks/babble/src/config"
-	"github.com/mosaicnetworks/babble/src/crypto/keys"
-	h "github.com/mosaicnetworks/babble/src/hashgraph"
-	"github.com/mosaicnetworks/babble/src/net"
-	"github.com/mosaicnetworks/babble/src/node"
-	"github.com/mosaicnetworks/babble/src/peers"
-	"github.com/mosaicnetworks/babble/src/service"
+	"github.com/kdag/src/config"
+	"github.com/kdag/src/crypto/keys"
+	h "github.com/kdag/src/hashgraph"
+	"github.com/kdag/src/net"
+	"github.com/kdag/src/node"
+	"github.com/kdag/src/peers"
+	"github.com/kdag/src/service"
 	"github.com/sirupsen/logrus"
 )
 
