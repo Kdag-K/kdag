@@ -4,7 +4,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 
-	cmd "github.com/mosaicnetworks/babble/cmd/dummy/commands"
+	cmd "github.com/kdag/cmd/dummy/commands"
 )
 
 func main() {
