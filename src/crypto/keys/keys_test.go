@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	bcrypto "github.com/mosaicnetworks/babble/src/crypto"
+	bcrypto "github.com/kdag/src/crypto"
 )
 
 func TestSimpleKeyfile(t *testing.T) {

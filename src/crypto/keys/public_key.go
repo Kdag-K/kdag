@@ -5,7 +5,7 @@ import (
 	"crypto/elliptic"
 	"hash/fnv"
 
-	"github.com/mosaicnetworks/babble/src/common"
+	"github.com/kdag/src/common"
 )
 
 // ToPublicKey is a wrapper around elliptic.Unmarshal which calls Curve() to
