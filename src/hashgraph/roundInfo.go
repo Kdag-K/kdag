@@ -3,8 +3,8 @@ package hashgraph
 import (
 	"bytes"
 
-	"github.com/kdag/src/common"
-	"github.com/kdag/src/peers"
+	"github.com/Kdag-K/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/peers"
 	"github.com/ugorji/go/codec"
 )
 

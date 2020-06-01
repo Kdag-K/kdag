@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	bcrypto "github.com/kdag/src/crypto"
+	bcrypto "github.com/Kdag-K/kdag/src/crypto"
 )
 
 func TestSimpleKeyfile(t *testing.T) {

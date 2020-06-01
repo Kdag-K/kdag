@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kdag/src/crypto/keys"
+	"github.com/Kdag-K/kdag/src/crypto/keys"
 )
 
 func createDummyEventBody() EventBody {

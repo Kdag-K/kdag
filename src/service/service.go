@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"sync"
 
-	hg "github.com/kdag/src/hashgraph"
+	hg "github.com/Kdag-K/kdag/src/hashgraph"
 
-	"github.com/kdag/src/node"
-	"github.com/kdag/src/peers"
+	"github.com/Kdag-K/kdag/src/node"
+	"github.com/Kdag-K/kdag/src/peers"
 	"github.com/sirupsen/logrus"
 )
 

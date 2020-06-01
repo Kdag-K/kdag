@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/kdag/src/version"
+	"github.com/Kdag-K/kdag/src/version"
 	"github.com/spf13/cobra"
 )
 

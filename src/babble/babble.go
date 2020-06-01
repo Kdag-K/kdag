@@ -5,13 +5,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/kdag/src/config"
-	"github.com/kdag/src/crypto/keys"
-	h "github.com/kdag/src/hashgraph"
-	"github.com/kdag/src/net"
-	"github.com/kdag/src/node"
-	"github.com/kdag/src/peers"
-	"github.com/kdag/src/service"
+	"github.com/Kdag-K/kdag/src/config"
+	"github.com/Kdag-K/kdag/src/crypto/keys"
+	h "github.com/Kdag-K/kdag/src/hashgraph"
+	"github.com/Kdag-K/kdag/src/net"
+	"github.com/Kdag-K/kdag/src/node"
+	"github.com/Kdag-K/kdag/src/peers"
+	"github.com/Kdag-K/kdag/src/service"
 	"github.com/sirupsen/logrus"
 )
 

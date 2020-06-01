@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kdag/src/common"
-	"github.com/kdag/src/crypto"
-	"github.com/kdag/src/crypto/keys"
-	"github.com/kdag/src/peers"
+	"github.com/Kdag-K/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/crypto"
+	"github.com/Kdag-K/kdag/src/crypto/keys"
+	"github.com/Kdag-K/kdag/src/peers"
 )
 
 // BlockBody ...

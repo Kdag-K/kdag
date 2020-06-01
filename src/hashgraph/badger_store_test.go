@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/kdag/src/peers"
+	"github.com/Kdag-K/kdag/src/peers"
 )
 
 func initBadgerStore(cacheSize int, t *testing.T) *BadgerStore {

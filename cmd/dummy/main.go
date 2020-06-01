@@ -4,7 +4,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 
-	cmd "github.com/kdag/cmd/dummy/commands"
+	cmd "github.com/Kdag-K/kdag/cmd/dummy/commands"
 )
 
 func main() {

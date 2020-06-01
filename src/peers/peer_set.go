@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"math"
 
-	"github.com/kdag/src/common"
-	"github.com/kdag/src/crypto"
+	"github.com/Kdag-K/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/crypto"
 )
 
 //PeerSet is a set of Peers forming a consensus network

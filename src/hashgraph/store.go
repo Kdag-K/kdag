@@ -1,6 +1,6 @@
 package hashgraph
 
-import "github.com/kdag/src/peers"
+import "github.com/Kdag-K/kdag/src/peers"
 
 // Store ...
 type Store interface {

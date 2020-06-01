@@ -3,8 +3,8 @@ package hashgraph
 import (
 	"testing"
 
-	"github.com/kdag/src/crypto/keys"
-	"github.com/kdag/src/peers"
+	"github.com/Kdag-K/kdag/src/crypto/keys"
+	"github.com/Kdag-K/kdag/src/peers"
 )
 
 func createTestBlock() *Block {

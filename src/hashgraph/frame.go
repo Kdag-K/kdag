@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"sort"
 
-	"github.com/kdag/src/crypto"
-	"github.com/kdag/src/peers"
+	"github.com/Kdag-K/kdag/src/crypto"
+	"github.com/Kdag-K/kdag/src/peers"
 	"github.com/ugorji/go/codec"
 )
 

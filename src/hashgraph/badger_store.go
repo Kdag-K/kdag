@@ -7,9 +7,10 @@ import (
 
 	"github.com/dgraph-io/badger"
 	badger_options "github.com/dgraph-io/badger/options"
-	cm "github.com/kdag/src/common"
-	"github.com/kdag/src/peers"
 	"github.com/sirupsen/logrus"
+
+	cm "github.com/Kdag-K/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/peers"
 )
 
 const (

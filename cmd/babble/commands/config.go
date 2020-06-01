@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/kdag/src/config"
+	"github.com/Kdag-K/kdag/src/config"
 )
 
 // CLIConfig contains configuration for the Run command

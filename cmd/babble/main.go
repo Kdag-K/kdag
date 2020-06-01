@@ -4,8 +4,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 
-	cmd "github.com/kdag/cmd/babble/commands"
-	cmd1 "github.com/kdag/cmd/babble/commands"
+	cmd "github.com/Kdag-K/kdag/cmd/babble/commands"
 )
 
 func main() {

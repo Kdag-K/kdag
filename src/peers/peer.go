@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/kdag/src/common"
-	"github.com/kdag/src/crypto/keys"
+	"github.com/Kdag-K/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/crypto/keys"
 )
 
 // Peer is a struct that holds Peer data

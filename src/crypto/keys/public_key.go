@@ -5,7 +5,7 @@ import (
 	"crypto/elliptic"
 	"hash/fnv"
 
-	"github.com/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/common"
 )
 
 // ToPublicKey is a wrapper around elliptic.Unmarshal which calls Curve() to

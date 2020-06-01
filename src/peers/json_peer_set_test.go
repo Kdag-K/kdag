@@ -10,7 +10,7 @@ import (
 
 	"reflect"
 
-	bkeys "github.com/kdag/src/crypto/keys"
+	bkeys "github.com/Kdag-K/kdag/src/crypto/keys"
 )
 
 func TestJSONPeerSet(t *testing.T) {
