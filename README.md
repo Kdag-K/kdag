@@ -146,7 +146,7 @@ details and a quick-start guide.
 
 ### Go
 Kdag is written in [Golang](https://golang.org/). Hence, the first step is to 
-install **Go version 1.9 or above** which is both the programming language and a 
+install **Go version 1.14 or above** which is both the programming language and a 
 CLI tool for managing Go code. Go is very opinionated and will require you to 
 [define a workspace](https://golang.org/doc/code.html#Workspaces) where all your 
 go code will reside.
@@ -158,15 +158,13 @@ GOPATH subdirectory:
 ```bash
 $ mkdir -p $GOPATH/src/github.com/Kdag-K/
 $ cd $GOPATH/src/github.com/Kdag-K
-[...]/mosaicnetworks$ git clone https://github.com/Kdag-K/kdag.git
+[...]/kdag$ git clone https://github.com/Kdag-K/kdag.git
 ```
-Kdag uses [Glide](http://github.com/Masterminds/glide) to manage dependencies.
-
-```bash
-[...]/kdag$ curl https://glide.sh/get | sh
-[...]/kdag$ glide install
+Download all dependencies and put them in the vendor folder.
 ```
-This will download all dependencies and put them in the **vendor** folder.
+[...]/kdag$ make vendor
+```
+Kdag uses go mod to manage dependencies.
 
 ### Other requirements
 
