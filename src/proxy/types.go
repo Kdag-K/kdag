@@ -1,6 +1,6 @@
 package proxy
 
-import "github.com/mosaicnetworks/babble/src/hashgraph"
+import "github.com/Kdag-K/kdag/src/hashgraph"
 
 // CommitResponse ...
 type CommitResponse struct {

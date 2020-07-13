@@ -26,7 +26,7 @@ done
 
 for i in $(seq 1 $N)
 do
-    docker create --name=node$i --net=babblenet --ip=172.77.5.$i mosaicnetworks/babble:latest run \
+    docker create --name=node$i --net=babblenet --ip=172.77.5.$i Kdag-K/kdag:latest run \
     --heartbeat=100ms \
     --moniker="node$i" \
     --cache-size=50000 \
