@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/Kdag-K/kdag/src/config"
 	"github.com/Kdag-K/kdag/src/crypto/keys"
 	h "github.com/Kdag-K/kdag/src/hashgraph"
@@ -12,7 +14,7 @@ import (
 	"github.com/Kdag-K/kdag/src/node"
 	"github.com/Kdag-K/kdag/src/peers"
 	"github.com/Kdag-K/kdag/src/service"
-	"github.com/sirupsen/logrus"
+
 )
 
 // Babble is a struct containing the key parts of a babble node
