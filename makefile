@@ -2,7 +2,7 @@ BUILD_TAGS?=babble
 
 # vendor installs all the Go dependencies in vendor/
 vendor:
-	(rm go.sum || rm -rf vendor ) && GO111MODULE=on go mod vendor
+	(rm -rf vendor ) && GO111MODULE=on go mod vendor
 
 # install compiles and places the binary in GOPATH/bin
 install:
