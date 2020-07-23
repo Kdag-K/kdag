@@ -14,7 +14,6 @@ import (
 	"github.com/Kdag-K/kdag/src/node"
 	"github.com/Kdag-K/kdag/src/peers"
 	"github.com/Kdag-K/kdag/src/service"
-
 )
 
 // Babble is a struct containing the key parts of a babble node

@@ -11,9 +11,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/Kdag-K/kdag/src/net/signal"
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
-	"github.com/Kdag-K/kdag/src/net/signal"
 	"github.com/pion/webrtc/v2"
 	"github.com/sirupsen/logrus"
 )

@@ -1,4 +1,4 @@
-package net
+sssssssuuuackage net
 
 import (
 	"github.com/Kdag-K/kdag/src/hashgraph"
