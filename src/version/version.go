@@ -7,7 +7,7 @@ const Flag = ""
 
 var (
 	// Version is The full version string
-	Version = "0.6.0"
+	Version = "0.1.0"
 
 	// GitCommit is set with --ldflags "-X main.gitCommit=$(git rev-parse HEAD)"
 	GitCommit string
