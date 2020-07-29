@@ -27,34 +27,22 @@ type PeerSet struct {
 //NewPeerSet creates a new PeerSet from a list of Peers
 func NewPeerSet(peers []*Peer) *PeerSet {
 	peerSet := &PeerSet{
-		ByPubKey: make(map[string]*Peer),
-		ByID:     make(map[uint32]*Peer),
+		Peers: peers,
 	}
 
-	for _, peer := range peers {
-		peerSet.ByPubKey[peer.PubKeyString()] = peer
-		peerSet.ByID[peer.ID()] = peer
-	}
-
-	peerSet.Peers = peers
+	peerSet.initMaps()
 
 	return peerSet
 }
 
 //NewPeerSetFromPeerSliceBytes creates a new PeerSet from a peerSlice in Bytes format
-func NewPeerSetFromPeerSliceBytes(peerSliceBytes []byte) (*PeerSet, error) {
-	//Decode Peer slice
-	peers := []*Peer{}
-
-	b := bytes.NewBuffer(peerSliceBytes)
-	dec := json.NewDecoder(b) //will read from b
-
-	err := dec.Decode(&peers)
-	if err != nil {
-		return nil, err
+func (peerSet *PeerSet) initMaps() {
+	peerSet.ByPubKey = make(map[string]*Peer)
+	peerSet.ByID = make(map[uint32]*Peer)
+	for _, peer := range peerSet.Peers {
+		peerSet.ByPubKey[peer.PubKeyString()] = peer
+		peerSet.ByID[peer.ID()] = peer
 	}
-	//create new PeerSet
-	return NewPeerSet(peers), nil
 }
 
 //WithNewPeer returns a new PeerSet with a list of peers including the new one.
@@ -148,6 +136,24 @@ func (peerSet *PeerSet) Marshal() ([]byte, error) {
 }
 
 //SuperMajority return the number of peers that forms a strong majortiy (+2/3)
+func (peerSet *PeerSet) Unmarshal(peerSliceBytes []byte) error {
+	// Decode Peer slice
+	peers := []*Peer{}
+
+	b := bytes.NewBuffer(peerSliceBytes)
+	dec := json.NewDecoder(b) // will read from b
+
+	err := dec.Decode(&peers)
+	if err != nil {
+		return err
+	}
+
+	// populate PeerSet
+	peerSet.Peers = peers
+	peerSet.initMaps()
+
+	return nil
+}
 //in the PeerSet
 func (peerSet *PeerSet) SuperMajority() int {
 	if peerSet.superMajority == nil {
