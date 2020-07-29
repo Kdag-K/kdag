@@ -1,5 +1,5 @@
 # KDAG
-## BFT Consensus platform for distributed applications.
+## BFT + Hashgraph Consensus platform for distributed applications.
 
 [![CircleCI](https://circleci.com/gh/kdag.svg?style=svg)](https://circleci.com/gh/kdag)
 
