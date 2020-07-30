@@ -7,12 +7,6 @@ import (
 	"github.com/btcsuite/btcd/btcec"
 )
 
-/*
-Babble keys and signing are based on elliptic curve cryptography. We chose the
-secp256k1 curve because it is also used by Bitcoin and Ethereum. We might make
-this configurable in the future.
-*/
-
 //Parameters of the secp256k1 curve. They are used in other function to verify
 //that a private key is valid.
 var (
@@ -22,6 +16,6 @@ var (
 
 //Curve returns an elliptic.Curve. We use btcsuite's golang implementation of
 //secp256k1.
-func Curve() elliptic.Curve {
+func curve() elliptic.Curve {
 	return btcec.S256() //secp256k1
 }

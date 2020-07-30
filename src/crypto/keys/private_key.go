@@ -9,11 +9,6 @@ import (
 	"math/big"
 )
 
-/*
-All the functions here are wrappers around the ecdsa.PrivateKey object of the
-standard library.
-*/
-
 const (
 	// number of bits in a big.Word
 	wordBits = 32 << (uint64(^big.Word(0)) >> 63)
@@ -24,7 +19,7 @@ const (
 //GenerateECDSAKey creates a new ecdsa.PrivateKey using the elliptic.Curve
 //returned by Curve() function.
 func GenerateECDSAKey() (*ecdsa.PrivateKey, error) {
-	return ecdsa.GenerateKey(Curve(), rand.Reader)
+	return ecdsa.GenerateKey(curve(), rand.Reader)
 }
 
 //DumpPrivateKey exports a private key into a binary dump.
@@ -38,7 +33,7 @@ func DumpPrivateKey(priv *ecdsa.PrivateKey) []byte {
 //ParsePrivateKey creates a private key with the given D value.
 func ParsePrivateKey(d []byte) (*ecdsa.PrivateKey, error) {
 	priv := new(ecdsa.PrivateKey)
-	priv.PublicKey.Curve = Curve()
+	priv.PublicKey.Curve = curve()
 
 	if 8*len(d) != priv.Params().BitSize {
 		return nil, fmt.Errorf("invalid length, need %d bits", priv.Params().BitSize)

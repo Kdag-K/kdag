@@ -10,13 +10,13 @@ import (
 
 //Sign is a wrapper around ecdsa.Sign which uses the built-in pseudo-random
 //generator rand.Reader.
-func Sign(priv *ecdsa.PrivateKey, hash []byte) (r, s *big.Int, err error) {
-	return ecdsa.Sign(rand.Reader, priv, hash)
+func Sign(priv *ecdsa.PrivateKey, data []byte) (r, s *big.Int, err error) {
+	return ecdsa.Sign(rand.Reader, priv, data)
 }
 
 //Verify is a wrapper around ecdsa.Verify.
-func Verify(pub *ecdsa.PublicKey, hash []byte, r, s *big.Int) bool {
-	return ecdsa.Verify(pub, hash, r, s)
+func Verify(pub *ecdsa.PublicKey, data []byte, r, s *big.Int) bool {
+	return ecdsa.Verify(pub, data, r, s)
 }
 
 //EncodeSignature returns a string representation of a signature.
