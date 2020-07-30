@@ -14,14 +14,14 @@ type pendingRound struct {
 }
 
 // RoundEvent ...
-type RoundEvent struct {
+type roundEvent struct {
 	Witness bool
 	Famous  common.Trilean
 }
 
 // RoundInfo ...
 type RoundInfo struct {
-	CreatedEvents  map[string]RoundEvent
+	CreatedEvents map[string]roundEvent
 	ReceivedEvents []string
 	queued         bool
 	decided        bool
@@ -30,7 +30,7 @@ type RoundInfo struct {
 // NewRoundInfo ...
 func NewRoundInfo() *RoundInfo {
 	return &RoundInfo{
-		CreatedEvents:  make(map[string]RoundEvent),
+		CreatedEvents:  make(map[string]roundEvent),
 		ReceivedEvents: []string{},
 	}
 }
@@ -39,7 +39,7 @@ func NewRoundInfo() *RoundInfo {
 func (r *RoundInfo) AddCreatedEvent(x string, witness bool) {
 	_, ok := r.CreatedEvents[x]
 	if !ok {
-		r.CreatedEvents[x] = RoundEvent{
+		r.CreatedEvents[x] = roundEvent{
 			Witness: witness,
 		}
 	}
@@ -54,7 +54,7 @@ func (r *RoundInfo) AddReceivedEvent(x string) {
 func (r *RoundInfo) SetFame(x string, f bool) {
 	e, ok := r.CreatedEvents[x]
 	if !ok {
-		e = RoundEvent{
+		e = roundEvent{
 			Witness: true,
 		}
 	}
@@ -68,13 +68,11 @@ func (r *RoundInfo) SetFame(x string, f bool) {
 	r.CreatedEvents[x] = e
 }
 
-/*
-WitnessesDecided returns true if a super-majority of witnesses are decided,
-and there are no undecided witnesses. Our algorithm relies on the fact that a
-witness that is not yet known when a super-majority of witnesses are already
-decided, has no chance of ever being famous. Once a Round is decided it stays
-decided, even if new witnesses are added after it was first decided.
-*/
+// WitnessesDecided returns true if a super-majority of witnesses are decided,
+// and there are no undecided witnesses. Our algorithm relies on the fact that a
+// witness that is not yet known when a super-majority of witnesses are already
+// decided, has no chance of ever being famous. Once a Round is decided it stays
+// decided, even if new witnesses are added after it was first decided.
 func (r *RoundInfo) WitnessesDecided(peerSet *peers.PeerSet) bool {
 	//if the round was already decided, it stays decided no matter what.
 	if r.decided {

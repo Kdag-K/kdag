@@ -9,10 +9,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/Kdag-K/kdag/src/common"
 	bkeys "github.com/Kdag-K/kdag/src/crypto/keys"
 	"github.com/Kdag-K/kdag/src/peers"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -31,7 +32,7 @@ type TestNode struct {
 
 func NewTestNode(key *ecdsa.PrivateKey) TestNode {
 	pubBytes := bkeys.FromPublicKey(&key.PublicKey)
-	pubID := bkeys.PublicKeyID(&key.PublicKey)
+	pubID := bkeys.PublicKeyID(pubBytes)
 	pubHex := bkeys.PublicKeyHex(&key.PublicKey)
 
 	node := TestNode{
@@ -418,14 +419,14 @@ func initRoundHashgraph(t *testing.T) (*Hashgraph, map[string]string) {
 	h, index, _ := initHashgraphFull(plays, false, n, t)
 
 	//Set Rounds manually; this would normally be handled by DivideRounds()
-	round0Witnesses := make(map[string]RoundEvent)
-	round0Witnesses[index["e0"]] = RoundEvent{Witness: true, Famous: common.Undefined}
-	round0Witnesses[index["e1"]] = RoundEvent{Witness: true, Famous: common.Undefined}
-	round0Witnesses[index["e2"]] = RoundEvent{Witness: true, Famous: common.Undefined}
+	round0Witnesses := make(map[string]roundEvent)
+	round0Witnesses[index["e0"]] = roundEvent{Witness: true, Famous: common.Undefined}
+	round0Witnesses[index["e1"]] = roundEvent{Witness: true, Famous: common.Undefined}
+	round0Witnesses[index["e2"]] = roundEvent{Witness: true, Famous: common.Undefined}
 	h.Store.SetRound(0, &RoundInfo{CreatedEvents: round0Witnesses})
 
-	round1Witnesses := make(map[string]RoundEvent)
-	round1Witnesses[index["f1"]] = RoundEvent{Witness: true, Famous: common.Undefined}
+	round1Witnesses := make(map[string]roundEvent)
+	round1Witnesses[index["f1"]] = roundEvent{Witness: true, Famous: common.Undefined}
 	h.Store.SetRound(1, &RoundInfo{CreatedEvents: round1Witnesses})
 
 	return h, index
@@ -735,7 +736,7 @@ func TestDivideRounds(t *testing.T) {
 
 	expectedRounds := map[int]*RoundInfo{
 		0: {
-			CreatedEvents: map[string]RoundEvent{
+			CreatedEvents: map[string]roundEvent{
 				index["e0"]:  {Witness: true, Famous: common.Undefined},
 				index["e1"]:  {Witness: true, Famous: common.Undefined},
 				index["e2"]:  {Witness: true, Famous: common.Undefined},
@@ -748,7 +749,7 @@ func TestDivideRounds(t *testing.T) {
 			},
 		},
 		1: {
-			CreatedEvents: map[string]RoundEvent{
+			CreatedEvents: map[string]roundEvent{
 				index["f1"]:  {Witness: true, Famous: common.Undefined},
 				index["s11"]: {Witness: false, Famous: common.Undefined},
 			},
@@ -1151,7 +1152,7 @@ func TestDivideRoundsBis(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedCreatedEvents := map[int]map[string]RoundEvent{
+	expectedCreatedEvents := map[int]map[string]roundEvent{
 		0: {
 			index["e0"]:   {Witness: true, Famous: common.Undefined},
 			index["e1"]:   {Witness: true, Famous: common.Undefined},
@@ -1266,7 +1267,7 @@ func TestDecideFame(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expectedCreatedEvents := map[int]map[string]RoundEvent{
+	expectedCreatedEvents := map[int]map[string]roundEvent{
 		0: {
 			index["e0"]:   {Witness: true, Famous: common.True},
 			index["e1"]:   {Witness: true, Famous: common.True},
