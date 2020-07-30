@@ -9,10 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Kdag-K/kdag/src/common"
-	"github.com/Kdag-K/kdag/src/proxy"
+	"github.com/pion/webrtc/v2"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
+
+	"github.com/Kdag-K/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/proxy"
 )
 
 const (
@@ -23,6 +25,28 @@ const (
 	// DefaultBadgerFile defines the default name of the folder containing the
 	// Badger database
 	DefaultBadgerFile = "badger_db"
+	DefaultCertFile = "cert.pem"
+)
+
+// Default configuration values.
+const (
+	DefaultLogLevel             = "debug"
+	DefaultBindAddr             = "127.0.0.1:1337"
+	DefaultServiceAddr          = "127.0.0.1:8000"
+	DefaultHeartbeatTimeout     = 10 * time.Millisecond
+	DefaultSlowHeartbeatTimeout = 1000 * time.Millisecond
+	DefaultTCPTimeout           = 1000 * time.Millisecond
+	DefaultJoinTimeout          = 10000 * time.Millisecond
+	DefaultCacheSize            = 10000
+	DefaultSyncLimit            = 1000
+	DefaultMaxPool              = 2
+	DefaultStore                = false
+	DefaultMaintenanceMode      = false
+	DefaultSuspendLimit         = 100
+	DefaultWebRTC               = false
+	DefaultSignalAddr           = "127.0.0.1:2443"
+	DefaultSignalRealm          = "office"
+	DefaultSignalSkipVerify     = false
 )
 
 // Config contains all the configuration properties of a Babble node.
@@ -113,7 +137,30 @@ type Config struct {
 
 	// LoadPeers determines whether or not to attempt loading the peer-set from
 	// a local json file.
-	LoadPeers bool `mapstructure:"loadpeers"`
+	WebRTC bool `mapstructure:"webrtc"`
+
+	// SignalAddr is the IP:PORT of the WebRTC signaling server. It is ignored
+	// when WebRTC is not enabled. The connection is over secured web-sockets,
+	// wss, and it possible to include a self-signed certificated in a file
+	// called cert.pem in the datadir. If no self-signed certificate is found,
+	// the server's certifacate signing authority better be trusted.
+	SignalAddr string `mapstructure:"signal-addr"`
+
+	// SignalRealm is an administrative domain within the WebRTC signaling
+	// server. WebRTC signaling messages are only routed within a Realm.
+	SignalRealm string `mapstructure:"signal-realm"`
+
+	// SignalSkipVerify controls whether the signal client verifies the server's
+	// certificate chain and host name. If SignalSkipVerify is true, TLS accepts
+	// any certificate presented by the server and any host name in that
+	// certificate. In this mode, TLS is susceptible to man-in-the-middle
+	// attacks. This should be used only for testing.
+	SignalSkipVerify bool `mapstructure:"signal-skip-verify"`
+
+	// ICEServers defines a slice describing servers available to be used by
+	// ICE, such as STUN and TURN servers.
+	// https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
+	ICEServers []webrtc.ICEServer
 
 	// Proxy is the application proxy that enables Babble to communicate with
 	// application.
@@ -127,24 +174,27 @@ type Config struct {
 
 // NewDefaultConfig returns the a config object with default values.
 func NewDefaultConfig() *Config {
-
 	config := &Config{
 		DataDir:              DefaultDataDir(),
-		LogLevel:             "debug",
-		BindAddr:             "127.0.0.1:1337",
-		ServiceAddr:          "127.0.0.1:8000",
-		HeartbeatTimeout:     10 * time.Millisecond,
-		SlowHeartbeatTimeout: 1000 * time.Millisecond,
-		TCPTimeout:           1000 * time.Millisecond,
-		JoinTimeout:          10000 * time.Millisecond,
-		CacheSize:            5000,
-		SyncLimit:            1000,
-		MaxPool:              2,
-		Store:                false,
-		MaintenanceMode:      false,
+		LogLevel:             DefaultLogLevel,
+		BindAddr:             DefaultBindAddr,
+		ServiceAddr:          DefaultServiceAddr,
+		HeartbeatTimeout:     DefaultHeartbeatTimeout,
+		SlowHeartbeatTimeout: DefaultSlowHeartbeatTimeout,
+		TCPTimeout:           DefaultTCPTimeout,
+		JoinTimeout:          DefaultJoinTimeout,
+		CacheSize:            DefaultCacheSize,
+		SyncLimit:            DefaultSyncLimit,
+		MaxPool:              DefaultMaxPool,
+		Store:                DefaultStore,
+		MaintenanceMode:      DefaultMaintenanceMode,
 		DatabaseDir:          DefaultDatabaseDir(),
-		LoadPeers:            true,
-		SuspendLimit:         100,
+		SuspendLimit:         DefaultSuspendLimit,
+		WebRTC:               DefaultWebRTC,
+		SignalAddr:           DefaultSignalAddr,
+		SignalRealm:          DefaultSignalRealm,
+		SignalSkipVerify:     DefaultSignalSkipVerify,
+		ICEServers:           DefaultICEServers(),
 	}
 
 	return config
@@ -177,6 +227,9 @@ func (c *Config) Keyfile() string {
 }
 
 // Logger returns a formatted logrus Entry, with prefix set to "babble".
+func (c *Config) CertFile() string {
+	return filepath.Join(c.DataDir, DefaultCertFile)
+}
 func (c *Config) Logger() *logrus.Entry {
 	if c.logger == nil {
 		c.logger = logrus.New()
@@ -237,5 +290,16 @@ func LogLevel(l string) logrus.Level {
 		return logrus.PanicLevel
 	default:
 		return logrus.DebugLevel
+	}
+}
+
+// DefaultICEServers returns a list containing a single ICEServer which
+// points to a public STUN server provided by Google. This default configuration
+// does not include a TURN server, so not all p2p connections will be possible.
+func DefaultICEServers() []webrtc.ICEServer {
+	return []webrtc.ICEServer{
+		{
+			URLs: []string{"stun:stun.l.google.com:19302"},
+		},
 	}
 }
