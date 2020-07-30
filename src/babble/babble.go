@@ -11,6 +11,7 @@ import (
 	"github.com/Kdag-K/kdag/src/crypto/keys"
 	h "github.com/Kdag-K/kdag/src/hashgraph"
 	"github.com/Kdag-K/kdag/src/net"
+	"github.com/Kdag-K/kdag/src/net/signal/wamp"
 	"github.com/Kdag-K/kdag/src/node"
 	"github.com/Kdag-K/kdag/src/peers"
 	"github.com/Kdag-K/kdag/src/service"
@@ -47,6 +48,11 @@ func (b *Babble) Init() error {
 		b.logger.WithError(err).Error("babble.go:Init() validateConfig")
 	}
 
+	b.logger.Debug("initKey")
+	if err := b.initKey(); err != nil {
+		b.logger.WithError(err).Error("babble.go:Init() initKey")
+		return err
+	}
 	b.logger.Debug("initPeers")
 	if err := b.initPeers(); err != nil {
 		b.logger.WithError(err).Error("babble.go:Init() initPeers")
@@ -102,13 +108,9 @@ func (b *Babble) validateConfig() error {
 
 	logFields := logrus.Fields{
 		"babble.DataDir":          b.Config.DataDir,
-		"babble.BindAddr":         b.Config.BindAddr,
-		"babble.AdvertiseAddr":    b.Config.AdvertiseAddr,
 		"babble.ServiceAddr":      b.Config.ServiceAddr,
 		"babble.NoService":        b.Config.NoService,
 		"babble.MaxPool":          b.Config.MaxPool,
-		"babble.Store":            b.Config.Store,
-		"babble.LoadPeers":        b.Config.LoadPeers,
 		"babble.LogLevel":         b.Config.LogLevel,
 		"babble.Moniker":          b.Config.Moniker,
 		"babble.HeartbeatTimeout": b.Config.HeartbeatTimeout,
@@ -122,18 +124,28 @@ func (b *Babble) validateConfig() error {
 	}
 
 	// Maintenance-mode only works with bootstrap
+	if b.Config.WebRTC {
+		logFields["babble.WebRTC"] = b.Config.WebRTC
+		logFields["babble.SignalAddr"] = b.Config.SignalAddr
+		logFields["babble.SignalRealm"] = b.Config.SignalRealm
+		logFields["babble.SignalSkipVerify"] = b.Config.SignalSkipVerify
+	} else {
+		logFields["babble.BindAddr"] = b.Config.BindAddr
+		logFields["babble.AdvertiseAddr"] = b.Config.AdvertiseAddr
+	}
 	if b.Config.MaintenanceMode {
-		b.logger.Debug("Config --maintenance-mode => --bootstrap")
+		b.logger.Debug("Config maintenance-mode => bootstrap")
 		b.Config.Bootstrap = true
 	}
 
 	// Bootstrap only works with store
 	if b.Config.Bootstrap {
-		b.logger.Debug("Config --boostrap => --store")
+		b.logger.Debug("Config boostrap => store")
 		b.Config.Store = true
 	}
 
 	if b.Config.Store {
+		logFields["babble.Store"] = b.Config.Store
 		logFields["babble.DatabaseDir"] = b.Config.DatabaseDir
 		logFields["babble.Bootstrap"] = b.Config.Bootstrap
 	}
@@ -153,7 +165,40 @@ func (b *Babble) validateConfig() error {
 }
 
 func (b *Babble) initTransport() error {
-	transport, err := net.NewTCPTransport(
+	if b.Config.MaintenanceMode {
+		return nil
+	}
+
+	if b.Config.WebRTC {
+		signal, err := wamp.NewClient(
+			b.Config.SignalAddr,
+			b.Config.SignalRealm,
+			keys.PublicKeyHex(&b.Config.Key.PublicKey),
+			b.Config.CertFile(),
+			b.Config.SignalSkipVerify,
+			b.Config.Logger().WithField("component", "webrtc-signal"),
+		)
+
+		if err != nil {
+			return err
+		}
+
+		webRTCTransport, err := net.NewWebRTCTransport(
+			signal,
+			b.Config.ICEServers,
+			b.Config.MaxPool,
+			b.Config.TCPTimeout,
+			b.Config.JoinTimeout,
+			b.Config.Logger().WithField("component", "webrtc-transport"),
+		)
+
+		if err != nil {
+			return err
+		}
+
+		b.Transport = webRTCTransport
+	} else {
+		tcpTransport, err := net.NewTCPTransport(
 		b.Config.BindAddr,
 		b.Config.AdvertiseAddr,
 		b.Config.MaxPool,
@@ -166,26 +211,14 @@ func (b *Babble) initTransport() error {
 		return err
 	}
 
-	b.Transport = transport
+		b.Transport = tcpTransport
+ }
 
 	return nil
-}
-
-func (b *Babble) initPeers() error {
-	if !b.Config.LoadPeers {
-		if b.Peers == nil {
-			return fmt.Errorf("LoadPeers false, but babble.Peers is nil")
-		}
-
-		if b.GenesisPeers == nil {
-			return fmt.Errorf("LoadPeers false, but babble.GenesisPeers is nil")
-		}
-
-		b.logger.Debug("LoadPeers is false. Skipped loading peers.")
-		return nil
 	}
 
 	// peers.json
+func (b *Babble) initPeers() error {
 	peerStore := peers.NewJSONPeerSet(b.Config.DataDir, true)
 
 	participants, err := peerStore.PeerSet()
@@ -194,6 +227,7 @@ func (b *Babble) initPeers() error {
 	}
 
 	b.Peers = participants
+	b.logger.Debug("Loaded Peers")
 
 	// Set Genesis Peer Set from peers.genesis.json
 	genesisPeerStore := peers.NewJSONPeerSet(b.Config.DataDir, false)
