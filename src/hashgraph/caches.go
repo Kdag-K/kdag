@@ -12,22 +12,22 @@ import (
 )
 
 // Key ...
-type Key struct {
+type key struct {
 	x, y string
 }
 
 // ToString ...
-func (k Key) ToString() string {
+func (k key) ToString() string {
 	return fmt.Sprintf("{%s, %s}", k.x, k.y)
 }
 
 // TreKey ...
-type TreKey struct {
+type treKey struct {
 	x, y, z string
 }
 
 // ToString ...
-func (k TreKey) ToString() string {
+func (k treKey) ToString() string {
 	return fmt.Sprintf("{%s, %s, %s}", k.x, k.y, k.z)
 }
 
