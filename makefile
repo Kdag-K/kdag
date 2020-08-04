@@ -1,4 +1,4 @@
-BUILD_TAGS?=babble
+BUILD_TAGS?=kdag
 
 # vendor installs all the Go dependencies in vendor/
 vendor:
