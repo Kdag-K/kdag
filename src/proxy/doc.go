@@ -1,7 +1,7 @@
-// Package proxy defines and implements AppProxy: the interface between Babble
+// Package proxy defines and implements AppGateway: the interface between Babble
 // and an application.
 //
-// Babble communicates with the App through an AppProxy interface, which has two
+// Babble communicates with the App through an AppGateway interface, which has two
 // implementations:
 //
 // - SocketProxy: A SocketProxy connects to an App via TCP sockets. It enables

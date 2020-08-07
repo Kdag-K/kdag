@@ -164,7 +164,7 @@ type Config struct {
 
 	// Proxy is the application proxy that enables Babble to communicate with
 	// application.
-	Proxy proxy.AppProxy
+	Proxy proxy.AppGateway
 
 	// Key is the private key of the validator.
 	Key *ecdsa.PrivateKey

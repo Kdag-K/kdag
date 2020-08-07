@@ -41,7 +41,7 @@ func runBabble(cmd *cobra.Command, args []string) error {
 	)
 
 	if err != nil {
-		_config.Babble.Logger().Error("Cannot initialize socket AppProxy:", err)
+		_config.Babble.Logger().Error("Cannot initialize socket AppGateway:", err)
 		return err
 	}
 

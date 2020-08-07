@@ -42,7 +42,7 @@ type Node struct {
 	// proxy is the link between the node and the application. It is used to
 	// commit blocks from Babble to the application, and relay submitted
 	// transactions from the application to Babble.
-	proxy proxy.AppProxy
+	proxy proxy.AppGateway
 
 	// submitCh is where the node listens for incoming transactions to be
 	// submitted to Babble
@@ -82,7 +82,7 @@ func NewNode(conf *config.Config,
 	genesisPeers *peers.PeerSet,
 	store hg.Store,
 	trans net.Transport,
-	proxy proxy.AppProxy,
+	proxy proxy.AppGateway,
 ) *Node {
 
 	// Prepare sigCh to relay SIGINT and SIGTERM system calls

@@ -112,7 +112,7 @@ before receiving them back, in blocks, ready to be applied to the *state*.
 
 ### API
 
-Kdag communicates with the App through an `AppProxy` interface, which has two
+Kdag communicates with the App through an `AppGateway` interface, which has two
 implementations:
 
 - `SocketProxy`: A SocketProxy connects to an App via TCP sockets. It enables 
@@ -122,7 +122,7 @@ implementations:
 - `InmemProxy` : An InmemProxy uses native callback handlers to integrate Kdag 
                  as a regular Go dependency. 
 
-The `AppProxy` interface exposes three methods for Kdag to call the App:
+The `AppGateway` interface exposes three methods for Kdag to call the App:
 
 - `CommitBlock(Block) ([]byte, error)`: Commits a block to the application and 
                                         returns the resulting state hash.
@@ -130,7 +130,7 @@ The `AppProxy` interface exposes three methods for Kdag to call the App:
                                       corresponding to a particular block index.
 - `Restore([]byte) error`: Restores the App state from a snapshot.
 
-Reciprocally, `AppProxy` relays transactions from the App to Kdag via a native 
+Reciprocally, `AppGateway` relays transactions from the App to Kdag via a native 
 Go channel - `SubmitCh` - which ties into the application differently depending 
 on the type of proxy (Socket or Inmem).
 

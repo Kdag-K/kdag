@@ -5,9 +5,9 @@ import (
 	"github.com/Kdag-K/kdag/src/node/state"
 )
 
-// AppProxy defines the interface which is used by Babble to communicate with
+// AppGateway defines the interface which is used by Babble to communicate with
 // the App
-type AppProxy interface {
+type AppGateway interface {
 	SubmitCh() chan []byte
 	CommitBlock(block hashgraph.Block) (CommitResponse, error)
 	GetSnapshot(blockIndex int) ([]byte, error)

@@ -1,12 +1,13 @@
 package dummy
 
 import (
-	"github.com/Kdag-K/kdag/src/proxy/inmem"
 	"github.com/sirupsen/logrus"
+
+	"github.com/Kdag-K/kdag/src/proxy/inmem"
 )
 
 // InmemDummyClient is an in-memory implementation of the dummy app. It actually
-// imlplements the AppProxy interface, and can be passed in the Babble
+// imlplements the AppGateway interface, and can be passed in the Babble
 // constructor directly
 type InmemDummyClient struct {
 	*inmem.InmemProxy

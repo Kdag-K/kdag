@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// SocketAppProxyClient is the component of the AppProxy that sends RPC requests
+// SocketAppProxyClient is the component of the AppGateway that sends RPC requests
 // to the App
 type SocketAppProxyClient struct {
 	clientAddr string
@@ -44,7 +44,7 @@ func (p *SocketAppProxyClient) getConnection() error {
 	return nil
 }
 
-// CommitBlock implements the AppProxy interface
+// CommitBlock implements the AppGateway interface
 func (p *SocketAppProxyClient) CommitBlock(block hashgraph.Block) (proxy.CommitResponse, error) {
 	if err := p.getConnection(); err != nil {
 		return proxy.CommitResponse{}, err
@@ -66,7 +66,7 @@ func (p *SocketAppProxyClient) CommitBlock(block hashgraph.Block) (proxy.CommitR
 	return commitResponse, nil
 }
 
-// GetSnapshot implementes the AppProxy interface
+// GetSnapshot implementes the AppGateway interface
 func (p *SocketAppProxyClient) GetSnapshot(blockIndex int) ([]byte, error) {
 	if err := p.getConnection(); err != nil {
 		return []byte{}, err
@@ -88,7 +88,7 @@ func (p *SocketAppProxyClient) GetSnapshot(blockIndex int) ([]byte, error) {
 	return snapshot, nil
 }
 
-// Restore implements the AppProxy interface
+// Restore implements the AppGateway interface
 func (p *SocketAppProxyClient) Restore(snapshot []byte) error {
 	if err := p.getConnection(); err != nil {
 		return err
@@ -109,7 +109,7 @@ func (p *SocketAppProxyClient) Restore(snapshot []byte) error {
 	return nil
 }
 
-// OnStateChanged implements the AppProxy interface
+// OnStateChanged implements the AppGateway interface
 func (p *SocketAppProxyClient) OnStateChanged(state state.State) error {
 	if err := p.getConnection(); err != nil {
 		return err

@@ -1,4 +1,4 @@
-// Package inmem implements an in-memory AppProxy to use Babble directly from Go
+// Package inmem implements an in-memory AppGateway to use Babble directly from Go
 // code.
 package inmem
 
@@ -10,7 +10,7 @@ import (
 	"github.com/Kdag-K/kdag/src/proxy"
 )
 
-// InmemProxy implements the AppProxy interface natively. It requires a
+// InmemProxy implements the AppGateway interface natively. It requires a
 // ProxyHandler that implements the callbacks that will be called to update the
 // application.
 type InmemProxy struct {
@@ -53,7 +53,7 @@ func (p *InmemProxy) SubmitTx(tx []byte) {
 }
 
 /*******************************************************************************
-* Implement AppProxy Interface                                                 *
+* Implement AppGateway Interface                                                 *
 *******************************************************************************/
 
 // SubmitCh is used internally by Babble to retrieve the channel through which
