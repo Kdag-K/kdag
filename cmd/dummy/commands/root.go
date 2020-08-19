@@ -21,7 +21,7 @@ var (
 func init() {
 	RootCmd.Flags().String("name", config.Name, "Client name")
 	RootCmd.Flags().String("client-listen", config.ClientAddr, "Listen IP:Port of Dummy Socket Client")
-	RootCmd.Flags().String("proxy-connect", config.ProxyAddr, "IP:Port to connect to Babble proxy")
+	RootCmd.Flags().String("proxy-connect", config.ProxyAddr, "IP:Port to connect to Kdag proxy")
 	RootCmd.Flags().Bool("discard", config.Discard, "discard output to stderr and sdout")
 	RootCmd.Flags().String("log", config.LogLevel, "debug, info, warn, error, fatal, panic")
 }
@@ -29,7 +29,7 @@ func init() {
 //RootCmd is the root command for Dummy
 var RootCmd = &cobra.Command{
 	Use:     "dummy",
-	Short:   "Dummy Socket Client for Babble",
+	Short:   "Dummy Socket Client for Kdag",
 	PreRunE: loadConfig,
 	RunE:    runDummy,
 }

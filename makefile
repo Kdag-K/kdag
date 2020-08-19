@@ -8,13 +8,13 @@ vendor:
 install:
 	go install --ldflags '-extldflags "-static"' \
 		--ldflags "-X github.com/Kdag-K/kdag/src/version.GitCommit=`git rev-parse HEAD`" \
-		./cmd/babble
+		./cmd/kdag
 
 # build compiles and places the binary in /build
 build:
 	CGO_ENABLED=0 go build \
 		--ldflags "-X github.com/Kdag-K/kdag/src/version.GitCommit=`git rev-parse HEAD`" \
-		-o build/babble ./cmd/babble/
+		-o build/kdag ./cmd/kdag/
 
 # dist builds binaries for all platforms and packages them for distribution
 dist:

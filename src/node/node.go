@@ -18,7 +18,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Node defines a babble node
+// Node defines a kdag node
 type Node struct {
 	// The node is implemented as a state-machine. The embedded state Manager
 	// object is used to manage the node's state.
@@ -40,15 +40,15 @@ type Node struct {
 	netCh <-chan net.RPC
 
 	// proxy is the link between the node and the application. It is used to
-	// commit blocks from Babble to the application, and relay submitted
-	// transactions from the application to Babble.
+	// commit blocks from Kdag to the application, and relay submitted
+	// transactions from the application to Kdag.
 	proxy proxy.AppGateway
 
 	// submitCh is where the node listens for incoming transactions to be
-	// submitted to Babble
+	// submitted to Kdag
 	submitCh chan []byte
 
-	// sigCh is where the node listens for signals to politely leave the Babble
+	// sigCh is where the node listens for signals to politely leave the Kdag
 	// network. It listens to SIGINT and SIGTERM
 	sigCh chan os.Signal
 
@@ -138,7 +138,7 @@ func (n *Node) Init() error {
 	}
 
 	// if the maintenance-mode option is not enabled, open the network transport
-	// and decide wether to babble normally, fast-forward, or join. Otherwise
+	// and decide wether to kdag normally, fast-forward, or join. Otherwise
 	// enter the suspended state.
 	if !n.conf.MaintenanceMode {
 		n.logger.Debug("Start Listening")
@@ -185,7 +185,7 @@ func (n *Node) Run(gossip bool) {
 
 		switch state {
 		case _state.Babbling:
-			n.babble(gossip)
+			n.kdag(gossip)
 		case _state.CatchingUp:
 			n.fastForward()
 		case _state.Joining:
@@ -432,9 +432,9 @@ func (n *Node) checkSuspend() {
 Babbling
 *******************************************************************************/
 
-// babble periodically initiates gossip or monologue as triggered by the
+// kdag periodically initiates gossip or monologue as triggered by the
 // controlTimer.
-func (n *Node) babble(gossip bool) {
+func (n *Node) kdag(gossip bool) {
 	n.logger.Info("BABBLING")
 
 	for {

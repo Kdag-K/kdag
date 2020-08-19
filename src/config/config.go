@@ -49,9 +49,9 @@ const (
 	DefaultSignalSkipVerify     = false
 )
 
-// Config contains all the configuration properties of a Babble node.
+// Config contains all the configuration properties of a Kdag node.
 type Config struct {
-	// DataDir is the top-level directory containing Babble configuration and
+	// DataDir is the top-level directory containing Kdag configuration and
 	// data
 	DataDir string `mapstructure:"datadir"`
 
@@ -59,7 +59,7 @@ type Config struct {
 	LogLevel string `mapstructure:"log"`
 
 	// BindAddr is the local address:port where this node gossips with other
-	// nodes. By default, this is "0.0.0.0", meaning Babble will bind to all
+	// nodes. By default, this is "0.0.0.0", meaning Kdag will bind to all
 	// addresses on the local machine. However, in some cases, there may be a
 	// routable address that cannot be bound. Use AdvertiseAddr to enable
 	// gossiping a different address to support this. If this address is not
@@ -79,7 +79,7 @@ type Config struct {
 	// with the DefaultServerMux of the http package. It is possible that
 	// another server in the same process is simultaneously using the
 	// DefaultServerMux. In which case, the handlers will be accessible from
-	// both servers. This is usefull when Babble is used in-memory and expecpted
+	// both servers. This is usefull when Kdag is used in-memory and expecpted
 	// to use the same endpoint (address:port) as the application's API.
 	ServiceAddr string `mapstructure:"service-listen"`
 
@@ -117,12 +117,12 @@ type Config struct {
 	// CacheSize is the max number of items in in-memory caches.
 	CacheSize int `mapstructure:"cache-size"`
 
-	// Bootstrap determines whether or not to load Babble from an existing
+	// Bootstrap determines whether or not to load Kdag from an existing
 	// database file. Forces Store, ie. bootstrap only works with a persistant
 	// database store.
 	Bootstrap bool `mapstructure:"bootstrap"`
 
-	// MaintenanceMode when set to true causes Babble to initialise in a
+	// MaintenanceMode when set to true causes Kdag to initialise in a
 	// suspended state. I.e. it does not start gossipping. Forces Bootstrap,
 	// which itself forces Store. I.e. MaintenanceMode only works if the node is
 	// bootstrapped from an existing database.
@@ -162,7 +162,7 @@ type Config struct {
 	// https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
 	ICEServers []webrtc.ICEServer
 
-	// Proxy is the application proxy that enables Babble to communicate with
+	// Proxy is the application proxy that enables Kdag to communicate with
 	// application.
 	Proxy proxy.AppGateway
 
@@ -210,7 +210,7 @@ func NewTestConfig(t testing.TB, level logrus.Level) *Config {
 	return config
 }
 
-// SetDataDir sets the top-level Babble directory, and updates the database
+// SetDataDir sets the top-level Kdag directory, and updates the database
 // directory if it is currently set to the default value. If the database
 // directory is not currently the default, it means the user has explicitely set
 // it to something else, so avoid changing it again here.
@@ -226,7 +226,7 @@ func (c *Config) Keyfile() string {
 	return filepath.Join(c.DataDir, DefaultKeyfile)
 }
 
-// Logger returns a formatted logrus Entry, with prefix set to "babble".
+// Logger returns a formatted logrus Entry, with prefix set to "kdag".
 func (c *Config) CertFile() string {
 	return filepath.Join(c.DataDir, DefaultCertFile)
 }
@@ -236,7 +236,7 @@ func (c *Config) Logger() *logrus.Entry {
 		c.logger.Level = LogLevel(c.LogLevel)
 		c.logger.Formatter = new(prefixed.TextFormatter)
 	}
-	return c.logger.WithField("prefix", "babble")
+	return c.logger.WithField("prefix", "kdag")
 }
 
 // DefaultDatabaseDir returns the default path for the badger database files.
@@ -244,18 +244,18 @@ func DefaultDatabaseDir() string {
 	return filepath.Join(DefaultDataDir(), DefaultBadgerFile)
 }
 
-// DefaultDataDir return the default directory name for top-level Babble config
+// DefaultDataDir return the default directory name for top-level Kdag config
 // based on the underlying OS, attempting to respect conventions.
 func DefaultDataDir() string {
 	// Try to place the data folder in the user's home dir
 	home := HomeDir()
 	if home != "" {
 		if runtime.GOOS == "darwin" {
-			return filepath.Join(home, ".Babble")
+			return filepath.Join(home, ".Kdag")
 		} else if runtime.GOOS == "windows" {
-			return filepath.Join(home, "AppData", "Roaming", "Babble")
+			return filepath.Join(home, "AppData", "Roaming", "Kdag")
 		} else {
-			return filepath.Join(home, ".babble")
+			return filepath.Join(home, ".kdag")
 		}
 	}
 	// As we cannot guess a stable location, return empty and handle later

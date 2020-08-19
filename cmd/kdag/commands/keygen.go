@@ -13,8 +13,8 @@ import (
 var (
 	privKeyFile           string
 	pubKeyFile            string
-	defaultPrivateKeyFile = fmt.Sprintf("%s/priv_key", _config.Babble.DataDir)
-	defaultPublicKeyFile  = fmt.Sprintf("%s/key.pub", _config.Babble.DataDir)
+	defaultPrivateKeyFile = fmt.Sprintf("%s/priv_key", _config.Kdag.DataDir)
+	defaultPublicKeyFile  = fmt.Sprintf("%s/key.pub", _config.Kdag.DataDir)
 )
 
 // NewKeygenCmd produces a KeygenCmd which create a key pair

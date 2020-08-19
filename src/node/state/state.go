@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 )
 
-// State captures the state of a Babble node: Babbling, CatchingUp, Joining,
+// State captures the state of a Kdag node: Babbling, CatchingUp, Joining,
 // Leaving, Suspended, or Shutdown
 type State uint32
 
@@ -19,11 +19,11 @@ const (
 	// future point in the hashgraph as part of the FastSync protocol.
 	CatchingUp
 
-	// Joining is the state in which a node attempts to join a Babble group by
+	// Joining is the state in which a node attempts to join a Kdag group by
 	// submitting a join request.
 	Joining
 
-	// Leaving is the state in which a node attempts to politely leave a Babble
+	// Leaving is the state in which a node attempts to politely leave a Kdag
 	// group by submitting a leave request.
 	Leaving
 

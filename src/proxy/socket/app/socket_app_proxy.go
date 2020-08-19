@@ -1,4 +1,4 @@
-// Package app implements a TCP AppGateway which resides inside Babble and
+// Package app implements a TCP AppGateway which resides inside Kdag and
 // connects to the other side of the proxy.
 package app
 
@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// SocketAppProxy is the Babble side of the socket AppGateway which communicates
+// SocketAppProxy is the Kdag side of the socket AppGateway which communicates
 // with the application via remote procedure calls (RPC) over TCP.
 type SocketAppProxy struct {
 	clientAddress string

@@ -15,7 +15,7 @@ import (
 
 func TestJSONPeerSet(t *testing.T) {
 	// Create a test dir
-	dir, err := ioutil.TempDir("", "babble")
+	dir, err := ioutil.TempDir("", "kdag")
 	if err != nil {
 		t.Fatalf("err: %v ", err)
 	}

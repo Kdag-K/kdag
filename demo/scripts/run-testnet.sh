@@ -43,6 +43,6 @@ do
     # --suspend-limit=100 \
     
     
-    docker cp $MPWD/conf/node$i node$i:/.babble
+    docker cp $MPWD/conf/node$i node$i:/.kdag
     docker start node$i
 done

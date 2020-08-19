@@ -1,4 +1,4 @@
-package babble
+package kdag
 
 import (
 	"crypto/ecdsa"
@@ -46,13 +46,13 @@ func TestInitStore(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	babble := NewBabble(conf)
+	kdag := NewKdag(conf)
 
-	if err := babble.initStore(); err != nil {
+	if err := kdag.initStore(); err != nil {
 		t.Fatal(err)
 	}
 
-	babble2 := NewBabble(conf)
+	babble2 := NewKdag(conf)
 
 	if err := babble2.initStore(); err != nil {
 		t.Fatal(err)
@@ -107,11 +107,11 @@ func TestMaintenanceMode(t *testing.T) {
 	conf.Key = keys["addr0"]
 	conf.Proxy = dummy.NewInmemDummyClient(conf.Logger())
 
-	babble := NewBabble(conf)
+	kdag := NewKdag(conf)
 
-	if err := babble.Init(); err != nil {
+	if err := kdag.Init(); err != nil {
 		t.Fatal(err)
 	}
 
-	babble.Node.Shutdown()
+	kdag.Node.Shutdown()
 }

@@ -29,7 +29,7 @@ func generateUUID() string {
 		buf[10:16])
 }
 
-// InmemTransport implements the Transport interface to allow testing Babble
+// InmemTransport implements the Transport interface to allow testing Kdag
 // internally.
 type InmemTransport struct {
 	sync.RWMutex

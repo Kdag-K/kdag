@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// VersionCmd displays the version of babble being used
+// VersionCmd displays the version of kdag being used
 var VersionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Show version info",

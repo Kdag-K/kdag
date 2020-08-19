@@ -38,7 +38,7 @@ var (
 
 /*
 NetworkTransport provides a network based transport that can be used to
-communicate with babble on remote machines. It requires an underlying stream
+communicate with kdag on remote machines. It requires an underlying stream
 layer to provide a stream abstraction, which can be simple TCP, or WebRTC.
 
 This transport is very simple and lightweight. Each RPC request is framed by

@@ -1,4 +1,4 @@
-// Package inmem implements an in-memory AppGateway to use Babble directly from Go
+// Package inmem implements an in-memory AppGateway to use Kdag directly from Go
 // code.
 package inmem
 
@@ -41,7 +41,7 @@ func NewInmemProxy(handler proxy.ProxyHandler,
 * SubmitTx                                                                     *
 *******************************************************************************/
 
-// SubmitTx is called by the App to submit a transaction to Babble.
+// SubmitTx is called by the App to submit a transaction to Kdag.
 func (p *InmemProxy) SubmitTx(tx []byte) {
 	//have to make a copy, or the tx will be garbage collected and weird stuff
 	//happens in transaction pool
@@ -56,7 +56,7 @@ func (p *InmemProxy) SubmitTx(tx []byte) {
 * Implement AppGateway Interface                                                 *
 *******************************************************************************/
 
-// SubmitCh is used internally by Babble to retrieve the channel through which
+// SubmitCh is used internally by Kdag to retrieve the channel through which
 // transactions are received from the App.
 func (p *InmemProxy) SubmitCh() chan []byte {
 	return p.submitCh

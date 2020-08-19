@@ -7,7 +7,7 @@ import (
 )
 
 // InmemDummyClient is an in-memory implementation of the dummy app. It actually
-// imlplements the AppGateway interface, and can be passed in the Babble
+// imlplements the AppGateway interface, and can be passed in the Kdag
 // constructor directly
 type InmemDummyClient struct {
 	*inmem.InmemProxy
@@ -30,7 +30,7 @@ func NewInmemDummyClient(logger *logrus.Entry) *InmemDummyClient {
 	return client
 }
 
-//SubmitTx sends a transaction to the Babble node via the InmemProxy
+//SubmitTx sends a transaction to the Kdag node via the InmemProxy
 func (c *InmemDummyClient) SubmitTx(tx []byte) {
 	c.InmemProxy.SubmitTx(tx)
 }

@@ -52,7 +52,7 @@ type FastForwardResponse struct {
 	Snapshot []byte
 }
 
-// JoinRequest is used to submit an InternalTransaction to join a Babble group.
+// JoinRequest is used to submit an InternalTransaction to join a Kdag group.
 type JoinRequest struct {
 	InternalTransaction hashgraph.InternalTransaction
 }

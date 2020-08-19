@@ -68,7 +68,7 @@ func (j *JSONPeerSet) PeerSet() (*PeerSet, error) {
 //NB this is safe because only value are altered, but no items are added / deleted
 //so the slice header is unaffected
 //This function standardises the peer string format passed into peerset. It matches
-//the format Babble derives from a private key.
+//the format Kdag derives from a private key.
 func cleansePeerSet(peers []*Peer) {
 	for _, peer := range peers {
 		peer.PubKeyHex = "0X" + strings.TrimPrefix((strings.ToUpper(peer.PubKeyHex)), "0X")

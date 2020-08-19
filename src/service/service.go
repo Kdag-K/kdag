@@ -43,11 +43,11 @@ func NewService(bindAddress string, n *node.Node, logger *logrus.Entry) *Service
 // registerHandlers registers the API handlers with the DefaultServerMux of the
 // http package. It is possible that another server in the same process is
 // simultaneously using the DefaultServerMux. In which case, the handlers will
-// be accessible from both servers. This is usefull when Babble is used
+// be accessible from both servers. This is usefull when Kdag is used
 // in-memory and expecpted to use the same endpoint (address:port) as the
 // application's API.
 func (s *Service) registerHandlers() {
-	s.logger.Debug("Registering Babble API handlers")
+	s.logger.Debug("Registering Kdag API handlers")
 	http.HandleFunc("/stats", s.makeHandler(s.GetStats))
 	http.HandleFunc("/block/", s.makeHandler(s.GetBlock))
 	http.HandleFunc("/blocks/", s.makeHandler(s.GetBlocks))
@@ -71,12 +71,12 @@ func (s *Service) makeHandler(fn func(http.ResponseWriter, *http.Request)) http.
 }
 
 // Serve calls ListenAndServe. This is a blocking call. It is not necessary to
-// call Serve when Babble is used in-memory and another server has already been
+// call Serve when Kdag is used in-memory and another server has already been
 // started with the DefaultServerMux and the same address:port combination.
-// Indeed, Babble API handlers have already been registered when the service was
+// Indeed, Kdag API handlers have already been registered when the service was
 // instantiated.
 func (s *Service) Serve() {
-	s.logger.WithField("bind_address", s.bindAddress).Debug("Serving Babble API")
+	s.logger.WithField("bind_address", s.bindAddress).Debug("Serving Kdag API")
 
 	// Use the DefaultServerMux
 	err := http.ListenAndServe(s.bindAddress, nil)

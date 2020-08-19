@@ -1,4 +1,4 @@
-package babble
+package kdag
 
 import (
 	"fmt"
@@ -17,8 +17,8 @@ import (
 	"github.com/Kdag-K/kdag/src/service"
 )
 
-// Babble is a struct containing the key parts of a babble node
-type Babble struct {
+// Kdag is a struct containing the key parts of a kdag node
+type Kdag struct {
 	Config       *config.Config
 	Node         *node.Node
 	Transport    net.Transport
@@ -29,10 +29,10 @@ type Babble struct {
 	logger       *logrus.Entry
 }
 
-// NewBabble is a factory method to produce
-// a Babble instance.
-func NewBabble(c *config.Config) *Babble {
-	engine := &Babble{
+// NewKdag is a factory method to produce
+// a Kdag instance.
+func NewKdag(c *config.Config) *Kdag {
+	engine := &Kdag{
 		Config: c,
 		logger: c.Logger(),
 	}
@@ -40,60 +40,60 @@ func NewBabble(c *config.Config) *Babble {
 	return engine
 }
 
-// Init initialises the babble engine
-func (b *Babble) Init() error {
+// Init initialises the kdag engine
+func (b *Kdag) Init() error {
 
 	b.logger.Debug("validateConfig")
 	if err := b.validateConfig(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() validateConfig")
+		b.logger.WithError(err).Error("kdag.go:Init() validateConfig")
 	}
 
 	b.logger.Debug("initKey")
 	if err := b.initKey(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() initKey")
+		b.logger.WithError(err).Error("kdag.go:Init() initKey")
 		return err
 	}
 	b.logger.Debug("initPeers")
 	if err := b.initPeers(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() initPeers")
+		b.logger.WithError(err).Error("kdag.go:Init() initPeers")
 		return err
 	}
 
 	b.logger.Debug("initStore")
 	if err := b.initStore(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() initStore")
+		b.logger.WithError(err).Error("kdag.go:Init() initStore")
 		return err
 	}
 
 	b.logger.Debug("initTransport")
 	if err := b.initTransport(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() initTransport")
+		b.logger.WithError(err).Error("kdag.go:Init() initTransport")
 		return err
 	}
 
 	b.logger.Debug("initKey")
 	if err := b.initKey(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() initKey")
+		b.logger.WithError(err).Error("kdag.go:Init() initKey")
 		return err
 	}
 
 	b.logger.Debug("initNode")
 	if err := b.initNode(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() initNode")
+		b.logger.WithError(err).Error("kdag.go:Init() initNode")
 		return err
 	}
 
 	b.logger.Debug("initService")
 	if err := b.initService(); err != nil {
-		b.logger.WithError(err).Error("babble.go:Init() initService")
+		b.logger.WithError(err).Error("kdag.go:Init() initService")
 		return err
 	}
 
 	return nil
 }
 
-// Run starts the Babble Node running
-func (b *Babble) Run() {
+// Run starts the Kdag Node running
+func (b *Kdag) Run() {
 	if b.Service != nil && b.Config.ServiceAddr != "" {
 		go b.Service.Serve()
 	}
@@ -101,37 +101,37 @@ func (b *Babble) Run() {
 	b.Node.Run(true)
 }
 
-func (b *Babble) validateConfig() error {
+func (b *Kdag) validateConfig() error {
 	// If --datadir was explicitely set, but not --db, the following line will
 	// update the default database dir to be inside the new datadir
 	b.Config.SetDataDir(b.Config.DataDir)
 
 	logFields := logrus.Fields{
-		"babble.DataDir":          b.Config.DataDir,
-		"babble.ServiceAddr":      b.Config.ServiceAddr,
-		"babble.NoService":        b.Config.NoService,
-		"babble.MaxPool":          b.Config.MaxPool,
-		"babble.LogLevel":         b.Config.LogLevel,
-		"babble.Moniker":          b.Config.Moniker,
-		"babble.HeartbeatTimeout": b.Config.HeartbeatTimeout,
-		"babble.TCPTimeout":       b.Config.TCPTimeout,
-		"babble.JoinTimeout":      b.Config.JoinTimeout,
-		"babble.CacheSize":        b.Config.CacheSize,
-		"babble.SyncLimit":        b.Config.SyncLimit,
-		"babble.EnableFastSync":   b.Config.EnableFastSync,
-		"babble.MaintenanceMode":  b.Config.MaintenanceMode,
-		"babble.SuspendLimit":     b.Config.SuspendLimit,
+		"kdag.DataDir":          b.Config.DataDir,
+		"kdag.ServiceAddr":      b.Config.ServiceAddr,
+		"kdag.NoService":        b.Config.NoService,
+		"kdag.MaxPool":          b.Config.MaxPool,
+		"kdag.LogLevel":         b.Config.LogLevel,
+		"kdag.Moniker":          b.Config.Moniker,
+		"kdag.HeartbeatTimeout": b.Config.HeartbeatTimeout,
+		"kdag.TCPTimeout":       b.Config.TCPTimeout,
+		"kdag.JoinTimeout":      b.Config.JoinTimeout,
+		"kdag.CacheSize":        b.Config.CacheSize,
+		"kdag.SyncLimit":        b.Config.SyncLimit,
+		"kdag.EnableFastSync":   b.Config.EnableFastSync,
+		"kdag.MaintenanceMode":  b.Config.MaintenanceMode,
+		"kdag.SuspendLimit":     b.Config.SuspendLimit,
 	}
 
 	// Maintenance-mode only works with bootstrap
 	if b.Config.WebRTC {
-		logFields["babble.WebRTC"] = b.Config.WebRTC
-		logFields["babble.SignalAddr"] = b.Config.SignalAddr
-		logFields["babble.SignalRealm"] = b.Config.SignalRealm
-		logFields["babble.SignalSkipVerify"] = b.Config.SignalSkipVerify
+		logFields["kdag.WebRTC"] = b.Config.WebRTC
+		logFields["kdag.SignalAddr"] = b.Config.SignalAddr
+		logFields["kdag.SignalRealm"] = b.Config.SignalRealm
+		logFields["kdag.SignalSkipVerify"] = b.Config.SignalSkipVerify
 	} else {
-		logFields["babble.BindAddr"] = b.Config.BindAddr
-		logFields["babble.AdvertiseAddr"] = b.Config.AdvertiseAddr
+		logFields["kdag.BindAddr"] = b.Config.BindAddr
+		logFields["kdag.AdvertiseAddr"] = b.Config.AdvertiseAddr
 	}
 	if b.Config.MaintenanceMode {
 		b.logger.Debug("Config maintenance-mode => bootstrap")
@@ -145,9 +145,9 @@ func (b *Babble) validateConfig() error {
 	}
 
 	if b.Config.Store {
-		logFields["babble.Store"] = b.Config.Store
-		logFields["babble.DatabaseDir"] = b.Config.DatabaseDir
-		logFields["babble.Bootstrap"] = b.Config.Bootstrap
+		logFields["kdag.Store"] = b.Config.Store
+		logFields["kdag.DatabaseDir"] = b.Config.DatabaseDir
+		logFields["kdag.Bootstrap"] = b.Config.Bootstrap
 	}
 
 	// SlowHeartbeat cannot be less than Heartbeat
@@ -157,14 +157,14 @@ func (b *Babble) validateConfig() error {
 			b.Config.HeartbeatTimeout)
 		b.Config.SlowHeartbeatTimeout = b.Config.HeartbeatTimeout
 	}
-	logFields["babble.SlowHeartbeatTimeout"] = b.Config.SlowHeartbeatTimeout
+	logFields["kdag.SlowHeartbeatTimeout"] = b.Config.SlowHeartbeatTimeout
 
 	b.logger.WithFields(logFields).Debug("Config")
 
 	return nil
 }
 
-func (b *Babble) initTransport() error {
+func (b *Kdag) initTransport() error {
 	if b.Config.MaintenanceMode {
 		return nil
 	}
@@ -218,7 +218,7 @@ func (b *Babble) initTransport() error {
 	}
 
 	// peers.json
-func (b *Babble) initPeers() error {
+func (b *Kdag) initPeers() error {
 	peerStore := peers.NewJSONPeerSet(b.Config.DataDir, true)
 
 	participants, err := peerStore.PeerSet()
@@ -243,7 +243,7 @@ func (b *Babble) initPeers() error {
 	return nil
 }
 
-func (b *Babble) initStore() error {
+func (b *Kdag) initStore() error {
 	if !b.Config.Store {
 		b.logger.Debug("Creating InmemStore")
 		b.Store = h.NewInmemStore(b.Config.CacheSize)
@@ -286,7 +286,7 @@ func (b *Babble) initStore() error {
 	return nil
 }
 
-func (b *Babble) initKey() error {
+func (b *Kdag) initKey() error {
 	if b.Config.Key == nil {
 		simpleKeyfile := keys.NewSimpleKeyfile(b.Config.Keyfile())
 
@@ -300,7 +300,7 @@ func (b *Babble) initKey() error {
 	return nil
 }
 
-func (b *Babble) initNode() error {
+func (b *Kdag) initNode() error {
 
 	validator := node.NewValidator(b.Config.Key, b.Config.Moniker)
 
@@ -335,7 +335,7 @@ func (b *Babble) initNode() error {
 	return b.Node.Init()
 }
 
-func (b *Babble) initService() error {
+func (b *Kdag) initService() error {
 	if !b.Config.NoService {
 		b.Service = service.NewService(b.Config.ServiceAddr, b.Node, b.Config.Logger())
 	}

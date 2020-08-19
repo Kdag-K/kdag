@@ -3,25 +3,26 @@ package dummy
 import (
 	"time"
 
-	socket "github.com/Kdag-K/kdag/src/proxy/socket/babble"
 	"github.com/sirupsen/logrus"
+
+	socket "github.com/Kdag-K/kdag/src/proxy/socket/kdag"
 )
 
-// DummySocketClient is a socket implementation of the dummy app. Babble and the
+// DummySocketClient is a socket implementation of the dummy app. Kdag and the
 // app run in separate processes and communicate through TCP sockets using
-// a SocketBabbleProxy and a SocketAppProxy.
+// a SocketKdagProxy and a SocketAppProxy.
 type DummySocketClient struct {
 	state       *State
-	babbleProxy *socket.SocketBabbleProxy
+	babbleProxy *socket.SocketKdagProxy
 	logger      *logrus.Entry
 }
 
 //NewDummySocketClient instantiates a DummySocketClient and starts the
-//SocketBabbleProxy
+//SocketKdagProxy
 func NewDummySocketClient(clientAddr string, nodeAddr string, logger *logrus.Entry) (*DummySocketClient, error) {
 	state := NewState(logger)
 
-	babbleProxy, err := socket.NewSocketBabbleProxy(nodeAddr, clientAddr, state, 1*time.Second, logger)
+	babbleProxy, err := socket.NewSocketKdagProxy(nodeAddr, clientAddr, state, 1*time.Second, logger)
 
 	if err != nil {
 		return nil, err
@@ -36,7 +37,7 @@ func NewDummySocketClient(clientAddr string, nodeAddr string, logger *logrus.Ent
 	return client, nil
 }
 
-//SubmitTx sends a transaction to Babble via the SocketProxy
+//SubmitTx sends a transaction to Kdag via the SocketProxy
 func (c *DummySocketClient) SubmitTx(tx []byte) error {
 	return c.babbleProxy.SubmitTx(tx)
 }

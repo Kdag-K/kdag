@@ -5,7 +5,7 @@ import (
 	"github.com/Kdag-K/kdag/src/node/state"
 )
 
-// AppGateway defines the interface which is used by Babble to communicate with
+// AppGateway defines the interface which is used by Kdag to communicate with
 // the App
 type AppGateway interface {
 	SubmitCh() chan []byte
