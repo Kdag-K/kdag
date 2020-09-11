@@ -1,0 +1,18 @@
+package main
+
+import (
+	"os"
+
+	cmd "github.com/Kdag-K/kdag/cmd/signal/commands"
+)
+
+func main() {
+	rootCmd := cmd.RootCmd
+
+	//Do not print usage when error occurs
+	rootCmd.SilenceUsage = true
+
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
