@@ -13,21 +13,23 @@ type pendingRound struct {
 	Decided bool
 }
 
-// RoundEvent ...
+// roundEvent indicates the witness and fame states of an Event.
 type roundEvent struct {
 	Witness bool
 	Famous  common.Trilean
 }
 
-// RoundInfo ...
+// RoundInfo encapsulates information about a round.
 type RoundInfo struct {
+	// CreatedEvents collects the events that were "created" in this round.
 	CreatedEvents map[string]roundEvent
+	// ReceivedEvents collects the events that were "received" in this round.
 	ReceivedEvents []string
 	queued         bool
 	decided        bool
 }
 
-// NewRoundInfo ...
+// NewRoundInfo creates a new RoundInfo.
 func NewRoundInfo() *RoundInfo {
 	return &RoundInfo{
 		CreatedEvents:  make(map[string]roundEvent),
@@ -35,7 +37,7 @@ func NewRoundInfo() *RoundInfo {
 	}
 }
 
-// AddCreatedEvent ...
+// AddCreatedEvent adds an event to the CreatedEvents map.
 func (r *RoundInfo) AddCreatedEvent(x string, witness bool) {
 	_, ok := r.CreatedEvents[x]
 	if !ok {
@@ -45,12 +47,12 @@ func (r *RoundInfo) AddCreatedEvent(x string, witness bool) {
 	}
 }
 
-// AddReceivedEvent ...
+// AddReceivedEvent adds an event to the ReceivedEvents list.
 func (r *RoundInfo) AddReceivedEvent(x string) {
 	r.ReceivedEvents = append(r.ReceivedEvents, x)
 }
 
-// SetFame ...
+// SetFame sets the famous status of an event.
 func (r *RoundInfo) SetFame(x string, f bool) {
 	e, ok := r.CreatedEvents[x]
 	if !ok {
@@ -93,7 +95,7 @@ func (r *RoundInfo) WitnessesDecided(peerSet *peers.PeerSet) bool {
 	return r.decided
 }
 
-//Witnesses return witnesses
+// Witnesses return witnesses.
 func (r *RoundInfo) Witnesses() []string {
 	res := []string{}
 	for x, e := range r.CreatedEvents {
@@ -105,7 +107,7 @@ func (r *RoundInfo) Witnesses() []string {
 	return res
 }
 
-//FamousWitnesses returns famous witnesses
+// FamousWitnesses returns famous witnesses.
 func (r *RoundInfo) FamousWitnesses() []string {
 	res := []string{}
 	for x, e := range r.CreatedEvents {
@@ -116,13 +118,13 @@ func (r *RoundInfo) FamousWitnesses() []string {
 	return res
 }
 
-// IsDecided ...
+// IsDecided returns true unless the famous status is undecided.
 func (r *RoundInfo) IsDecided(witness string) bool {
 	w, ok := r.CreatedEvents[witness]
 	return ok && w.Witness && w.Famous != common.Undefined
 }
 
-// Marshal ...
+// Marshal returns the JSON encoding of a RoundInfo.
 func (r *RoundInfo) Marshal() ([]byte, error) {
 	b := new(bytes.Buffer)
 	jh := new(codec.JsonHandle)
@@ -136,7 +138,7 @@ func (r *RoundInfo) Marshal() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-// Unmarshal ...
+// Unmarshal marshalls a JSON encoded RoundInfo.
 func (r *RoundInfo) Unmarshal(data []byte) error {
 	b := bytes.NewBuffer(data)
 	jh := new(codec.JsonHandle)
@@ -146,7 +148,7 @@ func (r *RoundInfo) Unmarshal(data []byte) error {
 	return dec.Decode(r)
 }
 
-// IsQueued ...
+// IsQueued returns true if the RoundInfo is marked as queued.
 func (r *RoundInfo) IsQueued() bool {
 	return r.queued
 }
