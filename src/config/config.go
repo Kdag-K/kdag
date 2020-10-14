@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pion/webrtc/v2"
+	webrtc "github.com/pion/webrtc/v2"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 
@@ -17,14 +17,17 @@ import (
 	"github.com/Kdag-K/kdag/src/proxy"
 )
 
+// Default filenames.
 const (
-	// DefaultKeyfile defines the default name of the file containing the
-	// validator's private key
+	// DefaultKeyfile is the default name of the file containing the validator's
+	// private key
 	DefaultKeyfile = "priv_key"
 
-	// DefaultBadgerFile defines the default name of the folder containing the
-	// Badger database
+	// DefaultBadgerFile is the default name of the folder containing the Badger
+	// database
 	DefaultBadgerFile = "badger_db"
+	// DefaultCertFile is the default name of the file containing the TLS
+	// certificate for connecting to the signaling server.
 	DefaultCertFile = "cert.pem"
 )
 
@@ -59,27 +62,26 @@ type Config struct {
 	LogLevel string `mapstructure:"log"`
 
 	// BindAddr is the local address:port where this node gossips with other
-	// nodes. By default, this is "0.0.0.0", meaning Kdag will bind to all
-	// addresses on the local machine. However, in some cases, there may be a
-	// routable address that cannot be bound. Use AdvertiseAddr to enable
-	// gossiping a different address to support this. If this address is not
-	// routable, the node will be in a constant flapping state as other nodes
-	// will treat the non-routability as a failure
+	// nodes. in some cases, there may be a routable address that cannot be
+	// bound. Use AdvertiseAddr to advertise a different address to support
+	// this. If this address is not routable, the node will be in a constant
+	// flapping state as other nodes will treat the non-routability as a
+	// failure.
 	BindAddr string `mapstructure:"listen"`
 
 	// AdvertiseAddr is used to change the address that we advertise to other
-	// nodes in the cluster
+	// nodes.
 	AdvertiseAddr string `mapstructure:"advertise"`
 
 	// NoService disables the HTTP API service.
 	NoService bool `mapstructure:"no-service"`
 
-	// ServiceAddr is the address:port that serves the user-facing API. If not
+	// ServiceAddr is the address:port of the optional HTTP service. If not
 	// specified, and "no-service" is not set, the API handlers are registered
 	// with the DefaultServerMux of the http package. It is possible that
 	// another server in the same process is simultaneously using the
 	// DefaultServerMux. In which case, the handlers will be accessible from
-	// both servers. This is usefull when Kdag is used in-memory and expecpted
+	// both servers. This is usefull when Kdag is used in-memory and expected
 	// to use the same endpoint (address:port) as the application's API.
 	ServiceAddr string `mapstructure:"service-listen"`
 
@@ -95,7 +97,8 @@ type Config struct {
 	// routines.
 	MaxPool int `mapstructure:"max-pool"`
 
-	// TCPTimeout is the timeout of gossip TCP connections.
+	// TCPTimeout is the timeout of gossip RPC connections. It also applies to
+	// WebRTC connections.
 	TCPTimeout time.Duration `mapstructure:"timeout"`
 
 	// JoinTimeout is the timeout of Join Requests
@@ -105,10 +108,10 @@ type Config struct {
 	// SyncResponse or EagerSyncRequest
 	SyncLimit int `mapstructure:"sync-limit"`
 
-	// EnableFastSync determines whether or not to enable the FastSync protocol.
+	// EnableFastSync enables the FastSync protocol.
 	EnableFastSync bool `mapstructure:"fast-sync"`
 
-	// Store is a flag that determines whether or not to use persistant storage.
+	// Store activates persistant storage.
 	Store bool `mapstructure:"store"`
 
 	// DatabaseDir is the directory containing database files.
@@ -128,15 +131,22 @@ type Config struct {
 	// bootstrapped from an existing database.
 	MaintenanceMode bool `mapstructure:"maintenance-mode"`
 
-	// SuspendLimit is the number of Undetermined Events (Events which haven't
-	// reached consensus) that will cause the node to become suspended
+	// SuspendLimit is the multiplier that is dynamically applied to the number
+	// of validators to determine the limit of undetermined events (events which
+	// haven't reached consensus) that will cause the node to become suspended.
+	// For example, if there are 4 validators and SuspendLimit=100, then the
+	// node will suspend itself after registering 400 undetermined events.
 	SuspendLimit int `mapstructure:"suspend-limit"`
 
 	// Moniker defines the friendly name of this node
 	Moniker string `mapstructure:"moniker"`
 
-	// LoadPeers determines whether or not to attempt loading the peer-set from
-	// a local json file.
+	// WebRTC determines whether to use a WebRTC transport. WebRTC uses a very
+	// different protocol stack than TCP/IP and enables peers to connect
+	// directly even with multiple layers of NAT between them, such as in
+	// cellular networks. WebRTC relies on a signalling server who's address is
+	// specified by SignalAddr. When WebRTC is enabled, BindAddr and
+	// AdvertiseAddr are ignored.
 	WebRTC bool `mapstructure:"webrtc"`
 
 	// SignalAddr is the IP:PORT of the WebRTC signaling server. It is ignored
@@ -172,7 +182,10 @@ type Config struct {
 	logger *logrus.Logger
 }
 
-// NewDefaultConfig returns the a config object with default values.
+// NewDefaultConfig returns a config object with default values. All the default
+// configuration values are set, even if they cancel eachother out. For example,
+// When WebRTC = false, all the Signal options are ignored. Likewise, when
+// WebRTC = true, BindAddr and ServiceAddr are not used.
 func NewDefaultConfig() *Config {
 	config := &Config{
 		DataDir:              DefaultDataDir(),
@@ -201,9 +214,7 @@ func NewDefaultConfig() *Config {
 }
 
 // NewTestConfig returns a config object with default values and a special
-// logger. the logger forces formatting and colors even when there is no tty
-// attached, which makes for more readable logs. The logger also provides info
-// about the calling function.
+// logger for debugging tests.
 func NewTestConfig(t testing.TB, level logrus.Level) *Config {
 	config := NewDefaultConfig()
 	config.logger = common.NewTestLogger(t, level)
@@ -226,10 +237,12 @@ func (c *Config) Keyfile() string {
 	return filepath.Join(c.DataDir, DefaultKeyfile)
 }
 
-// Logger returns a formatted logrus Entry, with prefix set to "kdag".
+// CertFile returns the full path of the file containing the signal-server TLS
+// certificate.
 func (c *Config) CertFile() string {
 	return filepath.Join(c.DataDir, DefaultCertFile)
 }
+// Logger returns a formatted logrus Entry, with prefix set to "babble".
 func (c *Config) Logger() *logrus.Entry {
 	if c.logger == nil {
 		c.logger = logrus.New()
