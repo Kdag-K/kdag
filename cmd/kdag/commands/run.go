@@ -78,6 +78,14 @@ func AddRunFlags(cmd *cobra.Command) {
 	cmd.Flags().DurationP("timeout", "t", _config.Kdag.TCPTimeout, "TCP Timeout")
 	cmd.Flags().DurationP("join-timeout", "j", _config.Kdag.JoinTimeout, "Join Timeout")
 	cmd.Flags().Int("max-pool", _config.Kdag.MaxPool, "Connection pool size max")
+	
+        // WebRTC
+	cmd.Flags().Bool("webrtc", _config.Kdag.WebRTC, "Use WebRTC transport")
+	cmd.Flags().String("signal-addr", _config.Kdag.SignalAddr, "IP:Port of WebRTC signaling server")
+	cmd.Flags().Bool("signal-skip-verify", _config.Kdag.SignalSkipVerify, "(Insecure) Accept any certificate presented by the signal server")
+	cmd.Flags().String("ice-addr", _config.Kdag.ICEAddress, "URI of a server providing ICE services such as STUN and TURN")
+	cmd.Flags().String("ice-username", _config.Kdag.ICEUsername, "Username to authenticate to the ICE server")
+	cmd.Flags().String("ice-password", _config.Kdag.ICEPassword, "Password to authenticate to the ICE server")
 
 	// Proxy
 	cmd.Flags().StringP("proxy-listen", "p", _config.ProxyAddr, "Listen IP:Port for kdag proxy")

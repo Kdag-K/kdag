@@ -123,16 +123,19 @@ func (b *Kdag) validateConfig() error {
 		"kdag.SuspendLimit":     b.Config.SuspendLimit,
 	}
 
-	// Maintenance-mode only works with bootstrap
+	// WebRTC requires signaling and ICE servers
 	if b.Config.WebRTC {
 		logFields["kdag.WebRTC"] = b.Config.WebRTC
 		logFields["kdag.SignalAddr"] = b.Config.SignalAddr
 		logFields["kdag.SignalRealm"] = b.Config.SignalRealm
 		logFields["kdag.SignalSkipVerify"] = b.Config.SignalSkipVerify
+		logFields["kdag.ICEAddress"] = b.Config.ICEAddress
+		logFields["kdag.ICEUsername"] = b.Config.ICEUsername
 	} else {
 		logFields["kdag.BindAddr"] = b.Config.BindAddr
 		logFields["kdag.AdvertiseAddr"] = b.Config.AdvertiseAddr
 	}
+	// Maintenance-mode only works with bootstrap
 	if b.Config.MaintenanceMode {
 		b.logger.Debug("Config maintenance-mode => bootstrap")
 		b.Config.Bootstrap = true
@@ -176,6 +179,7 @@ func (b *Kdag) initTransport() error {
 			keys.PublicKeyHex(&b.Config.Key.PublicKey),
 			b.Config.CertFile(),
 			b.Config.SignalSkipVerify,
+			b.Config.TCPTimeout,
 			b.Config.Logger().WithField("component", "webrtc-signal"),
 		)
 

@@ -48,8 +48,11 @@ const (
 	DefaultSuspendLimit         = 100
 	DefaultWebRTC               = false
 	DefaultSignalAddr           = "127.0.0.1:2443"
-	DefaultSignalRealm          = "office"
+	DefaultSignalRealm          = "main"
 	DefaultSignalSkipVerify     = false
+	DefaultICEAddress           = "stun:stun.l.google.com:19302"
+	DefaultICEUsername          = ""
+	DefaultICEPassword          = ""
 )
 
 // Config contains all the configuration properties of a Kdag node.
@@ -207,7 +210,9 @@ func NewDefaultConfig() *Config {
 		SignalAddr:           DefaultSignalAddr,
 		SignalRealm:          DefaultSignalRealm,
 		SignalSkipVerify:     DefaultSignalSkipVerify,
-		ICEServers:           DefaultICEServers(),
+		ICEAddress:           DefaultICEAddress,
+		ICEUsername:          DefaultICEUsername,
+		ICEPassword:          DefaultICEPassword,
 	}
 
 	return config
@@ -241,6 +246,20 @@ func (c *Config) Keyfile() string {
 // certificate.
 func (c *Config) CertFile() string {
 	return filepath.Join(c.DataDir, DefaultCertFile)
+}
+// ICEServers returns a list of ICE servers used by the WebRTCStreamLayer to
+// connect to peers. The list contains a single item which is based on the
+// configuration passed through the config object. This configuration is limited
+// to a single server, with password-based authentication.
+func (c *Config) ICEServers() []webrtc.ICEServer {
+	return []webrtc.ICEServer{
+		{
+			URLs:           []string{c.ICEAddress},
+			Username:       c.ICEUsername,
+			Credential:     c.ICEPassword,
+			CredentialType: webrtc.ICECredentialTypePassword,
+		},
+	}
 }
 // Logger returns a formatted logrus Entry, with prefix set to "babble".
 func (c *Config) Logger() *logrus.Entry {
@@ -306,13 +325,12 @@ func LogLevel(l string) logrus.Level {
 	}
 }
 
-// DefaultICEServers returns a list containing a single ICEServer which
-// points to a public STUN server provided by Google. This default configuration
-// does not include a TURN server, so not all p2p connections will be possible.
+// DefaultICEServers returns the default ICE configuration with one URL pointing
+// to a public Google STUN server.
 func DefaultICEServers() []webrtc.ICEServer {
 	return []webrtc.ICEServer{
 		{
-			URLs: []string{"stun:stun.l.google.com:19302"},
+			URLs: []string{DefaultICEAddress},
 		},
 	}
 }
