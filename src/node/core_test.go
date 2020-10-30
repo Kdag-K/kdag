@@ -172,3 +172,82 @@ func TestEventDiff(t *testing.T) {
 		}
 	}
 }
+/*
+h0  |   h2
+| \ | / |
+|   h1  |
+|  /|   |--------------------
+g02 |   | R2
+| \ |   |
+|   \   |
+|   | \ |
+|   |  g21
+|   | / |
+|  g10  |
+| / |   |
+g0  |   g2
+| \ | / |
+|   g1  |
+|  /|   |--------------------
+f02 |   | R1
+| \ |   |
+|   \   |
+|   | \ |
+|   |  f21
+|   | / |
+|  f10  |
+| / |   |
+f0  |   f2
+| \ | / |
+|   f1  |
+|  /|   |--------------------
+e02 |   | R0 Consensus
+| \ |   |
+|   \   |
+|   | \ |
+|   |  e21
+|   | / |
+|  e10  |
+| / |   |
+e0  e1  e2
+0   1    2
+*/
+type play struct {
+	from        int
+	to          int
+	payload     [][]byte
+	internalTxs []hg.InternalTransaction
+}
+
+func initConsensusHashgraph(t *testing.T) []*core {
+	cores, _, _ := initCores(3, t)
+	playbook := []play{
+		{from: 0, to: 1, payload: [][]byte{[]byte("e10")}},
+		{from: 1, to: 2, payload: [][]byte{[]byte("e21")}},
+		{from: 2, to: 0, payload: [][]byte{[]byte("e02")}},
+		{from: 0, to: 1, payload: [][]byte{[]byte("f1")}},
+		{from: 1, to: 0, payload: [][]byte{[]byte("f0")}},
+		{from: 1, to: 2, payload: [][]byte{[]byte("f2")}},
+
+		{from: 0, to: 1, payload: [][]byte{[]byte("f10")}},
+		{from: 1, to: 2, payload: [][]byte{[]byte("f21")}},
+		{from: 2, to: 0, payload: [][]byte{[]byte("f02")}},
+		{from: 0, to: 1, payload: [][]byte{[]byte("g1")}},
+		{from: 1, to: 0, payload: [][]byte{[]byte("g0")}},
+		{from: 1, to: 2, payload: [][]byte{[]byte("g2")}},
+
+		{from: 0, to: 1, payload: [][]byte{[]byte("g10")}},
+		{from: 1, to: 2, payload: [][]byte{[]byte("g21")}},
+		{from: 2, to: 0, payload: [][]byte{[]byte("g02")}},
+		{from: 0, to: 1, payload: [][]byte{[]byte("h1")}},
+		{from: 1, to: 0, payload: [][]byte{[]byte("h0")}},
+		{from: 1, to: 2, payload: [][]byte{[]byte("h2")}},
+	}
+
+	for _, play := range playbook {
+		if err := syncAndRunConsensus(cores, play.from, play.to, play.payload, play.internalTxs); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return cores
+}
