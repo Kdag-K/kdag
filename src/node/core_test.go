@@ -251,3 +251,24 @@ func initConsensusHashgraph(t *testing.T) []*core {
 	}
 	return cores
 }
+
+func TestConsensus(t *testing.T) {
+	cores := initConsensusHashgraph(t)
+
+	if l := len(cores[0].getConsensusEvents()); l != 6 {
+		t.Fatalf("length of consensus should be 6 not %d", l)
+	}
+
+	core0Consensus := cores[0].getConsensusEvents()
+	core1Consensus := cores[1].getConsensusEvents()
+	core2Consensus := cores[2].getConsensusEvents()
+
+	for i, e := range core0Consensus {
+		if core1Consensus[i] != e {
+			t.Fatalf("core 1 consensus[%d] does not match core 0's", i)
+		}
+		if core2Consensus[i] != e {
+			t.Fatalf("core 2 consensus[%d] does not match core 0's", i)
+		}
+	}
+}
