@@ -272,3 +272,18 @@ func TestConsensus(t *testing.T) {
 		}
 	}
 }
+func syncAndRunConsensus(cores []*core, from int, to int, payload [][]byte, internalTxs []hg.InternalTransaction) error {
+	if err := synchronizeCores(cores, from, to, payload, internalTxs); err != nil {
+		return err
+	}
+	cores[to].processSigPool()
+	return nil
+}
+func getName(index map[string]string, hash string) string {
+	for name, h := range index {
+		if h == hash {
+			return name
+		}
+	}
+	return fmt.Sprintf("%s not found", hash)
+}
