@@ -272,6 +272,231 @@ func TestConsensus(t *testing.T) {
 		}
 	}
 }
+func TestCoreFastForwardAfterJoin(t *testing.T) {
+	cores, bobPeer, bobKey := initR2DynHashgraph(t)
+
+	initPeerSet, err := cores[0].hg.Store.GetPeerSet(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	genesisPeerSet := clonePeerSet(t, initPeerSet.Peers)
+
+	bobCore := newCore(
+		NewValidator(bobKey, bobPeer.Moniker),
+		initPeerSet,
+		genesisPeerSet,
+		hg.NewInmemStore(1000),
+		proxy.DummyCommitCallback,
+		false,
+		common.NewTestEntry(t, common.TestLogLevel))
+
+	bobCore.setHeadAndSeq()
+
+	cores = append(cores, bobCore)
+
+	/***************************************************************************
+		Manually FastForward Bob from cores[2]
+
+		Testing 2 scenarios:
+
+			- AnchorBlock: check that the AnchorBlock (Block 5) is selected
+						   correctly and that FuturePeerSets works.
+
+			- Block 0: check that FastForwarding from a Round below the PeerSet
+			           change works.
+	***************************************************************************/
+
+	type play struct {
+		block           *hg.Block
+		frame           *hg.Frame
+		roundLowerBound int
+	}
+
+	plays := []play{}
+
+	//Prepare Block 0 scenario
+	block0, err := cores[2].hg.Store.GetBlock(0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	frame0, err := cores[2].hg.Store.GetFrame(block0.RoundReceived())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	plays = append(plays, play{block0, frame0, 0})
+
+	//Prepare AnchorBlock scenario
+	anchorBlock, anchorFrame, err := cores[2].hg.GetAnchorBlockWithFrame()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	plays = append(plays, play{anchorBlock, anchorFrame, 6})
+
+	/***************************************************************************
+		Run the same test for both scenarios
+	***************************************************************************/
+
+	for _, p := range plays {
+
+		/***********************************************************************
+			FastForward, Sync, and Run Consensus
+		***********************************************************************/
+
+		marshalledBlock, err := p.block.Marshal()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var unmarshalledBlock hg.Block
+		err = unmarshalledBlock.Unmarshal(marshalledBlock)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		marshalledFrame, err := p.frame.Marshal()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		var unmarshalledFrame hg.Frame
+		err = unmarshalledFrame.Unmarshal(marshalledFrame)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		err = cores[3].fastForward(&unmarshalledBlock, &unmarshalledFrame)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		//continue after FastForward
+		err = syncAndRunConsensus(cores, 2, 3, [][]byte{}, []hg.InternalTransaction{})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		/***********************************************************************
+			Check Known
+		***********************************************************************/
+
+		knownBy3 := cores[3].knownEvents()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		expectedKnown := map[uint32]int{
+			cores[0].validator.ID(): 9,
+			cores[1].validator.ID(): 15,
+			cores[2].validator.ID(): 10,
+			cores[3].validator.ID(): 0,
+		}
+
+		if !reflect.DeepEqual(knownBy3, expectedKnown) {
+			t.Fatalf("Cores[3].Known should be %v, not %v", expectedKnown, knownBy3)
+		}
+
+		/***********************************************************************
+			Check Rounds
+		***********************************************************************/
+
+		//The fame of witnesses of the FastForward's Block RoundReceived and
+		//below are not reprocessed after Reset. No need to test those rounds.
+		for i := p.roundLowerBound; i <= 8; i++ {
+			c3RI, err := cores[3].hg.Store.GetRound(i)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			c2RI, err := cores[2].hg.Store.GetRound(i)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			c3RIw := c3RI.Witnesses()
+			c2RIw := c2RI.Witnesses()
+			sort.Strings(c3RIw)
+			sort.Strings(c2RIw)
+
+			if !reflect.DeepEqual(c3RIw, c2RIw) {
+				t.Logf("Round(%d).Witnesses do not match", i)
+			}
+
+			if !reflect.DeepEqual(c3RI.CreatedEvents, c3RI.CreatedEvents) {
+				t.Logf("Round(%d).CreatedEvents do not match", i)
+			}
+
+			c3RIr := c3RI.ReceivedEvents
+			c2RIr := c2RI.ReceivedEvents
+			sort.Strings(c3RIr)
+			sort.Strings(c2RIr)
+
+			if !reflect.DeepEqual(c3RIw, c2RIw) {
+				t.Logf("Round(%d).ReceivedEvents do not match", i)
+			}
+		}
+
+		/***********************************************************************
+			Check PeerSets
+		***********************************************************************/
+
+		for i := p.roundLowerBound; i <= 8; i++ {
+			c3PS, err := cores[3].hg.Store.GetPeerSet(i)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			c2PS, err := cores[2].hg.Store.GetPeerSet(i)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if !reflect.DeepEqual(c3PS.Hex(), c2PS.Hex()) {
+				t.Fatalf("PeerSet(%d) does not match", i)
+			}
+		}
+
+		/***********************************************************************
+			Check Consensus Rounds and Blocks
+		***********************************************************************/
+
+		if r := cores[3].getLastConsensusRoundIndex(); r == nil || *r != 6 {
+			t.Fatalf("Cores[3] last consensus Round should be 4, not %v", *r)
+		}
+
+		if lbi := cores[3].hg.Store.LastBlockIndex(); lbi != 5 {
+			t.Fatalf("Cores[3].hg.LastBlockIndex should be 5, not %d", lbi)
+		}
+	}
+
+}
+
+/******************************************************************************/
+
+func synchronizeCores(cores []*core, from int, to int, payload [][]byte, internalTxs []hg.InternalTransaction) error {
+	knownByTo := cores[to].knownEvents()
+	unknownByTo, err := cores[from].eventDiff(knownByTo)
+	if err != nil {
+		return err
+	}
+
+	unknownWire, err := cores[from].toWire(unknownByTo)
+	if err != nil {
+		return err
+	}
+
+	cores[to].addTransactions(payload)
+
+	for _, it := range internalTxs {
+		cores[to].addInternalTransaction(it)
+	}
+
+	return cores[to].sync(cores[from].validator.ID(), unknownWire)
+}
+
 func syncAndRunConsensus(cores []*core, from int, to int, payload [][]byte, internalTxs []hg.InternalTransaction) error {
 	if err := synchronizeCores(cores, from, to, payload, internalTxs); err != nil {
 		return err
