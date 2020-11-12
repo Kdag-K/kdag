@@ -172,6 +172,129 @@ func TestEventDiff(t *testing.T) {
 		}
 	}
 }
+
+func TestSync(t *testing.T) {
+	cores, _, index := initCores(3, t)
+
+	/*
+	   core 0           core 1          core 2
+
+	   e0  |   |        |   e1  |       |   |   e2
+	   0   1   2        0   1   2       0   1   2
+	*/
+
+	//core 1 is going to tell core 0 everything it knows
+	if err := synchronizeCores(cores, 1, 0, [][]byte{}, []hg.InternalTransaction{}); err != nil {
+		t.Fatal(err)
+	}
+
+	/*
+	   core 0           core 1          core 2
+
+	   e01 |   |
+	   | \ |   |
+	   e0  e1  |        |   e1  |       |   |   e2
+	   0   1   2        0   1   2       0   1   2
+	*/
+
+	knownBy0 := cores[0].knownEvents()
+	if k := knownBy0[cores[0].validator.ID()]; k != 1 {
+		t.Fatalf("core 0 should have last-index 1 for core 0, not %d", k)
+	}
+	if k := knownBy0[cores[1].validator.ID()]; k != 0 {
+		t.Fatalf("core 0 should have last-index 0 for core 1, not %d", k)
+	}
+	if k := knownBy0[cores[2].validator.ID()]; k != -1 {
+		t.Fatalf("core 0 should have last-index -1 for core 2, not %d", k)
+	}
+	core0Head, _ := cores[0].getHead()
+	if core0Head.SelfParent() != index["e0"] {
+		t.Fatalf("core 0 head self-parent should be e0")
+	}
+	if core0Head.OtherParent() != index["e1"] {
+		t.Fatalf("core 0 head other-parent should be e1")
+	}
+	index["e01"] = core0Head.Hex()
+
+	//core 0 is going to tell core 2 everything it knows
+	if err := synchronizeCores(cores, 0, 2, [][]byte{}, []hg.InternalTransaction{}); err != nil {
+		t.Fatal(err)
+	}
+
+	/*
+
+	   core 0           core 1          core 2
+
+	                                    |   |  e20
+	                                    |   | / |
+	                                    |   /   |
+	                                    | / |   |
+	   e01 |   |                        e01 |   |
+	   | \ |   |                        | \ |   |
+	   e0  e1  |        |   e1  |       e0  e1  e2
+	   0   1   2        0   1   2       0   1   2
+	*/
+
+	knownBy2 := cores[2].knownEvents()
+	if k := knownBy2[cores[0].validator.ID()]; k != 1 {
+		t.Fatalf("core 2 should have last-index 1 for core 0, not %d", k)
+	}
+	if k := knownBy2[cores[1].validator.ID()]; k != 0 {
+		t.Fatalf("core 2 should have last-index 0 core 1, not %d", k)
+	}
+	if k := knownBy2[cores[2].validator.ID()]; k != 1 {
+		t.Fatalf("core 2 should have last-index 1 for core 2, not %d", k)
+	}
+	core2Head, _ := cores[2].getHead()
+	if core2Head.SelfParent() != index["e2"] {
+		t.Fatalf("core 2 head self-parent should be e2")
+	}
+	if core2Head.OtherParent() != index["e01"] {
+		t.Fatalf("core 2 head other-parent should be e01")
+	}
+	index["e20"] = core2Head.Hex()
+
+	//core 2 is going to tell core 1 everything it knows
+	if err := synchronizeCores(cores, 2, 1, [][]byte{}, []hg.InternalTransaction{}); err != nil {
+		t.Fatal(err)
+	}
+
+	/*
+
+	   core 0           core 1          core 2
+
+	                    |  e12  |
+	                    |   | \ |
+	                    |   |  e20      |   |  e20
+	                    |   | / |       |   | / |
+	                    |   /   |       |   /   |
+	                    | / |   |       | / |   |
+	   e01 |   |        e01 |   |       e01 |   |
+	   | \ |   |        | \ |   |       | \ |   |
+	   e0  e1  |        e0  e1  e2      e0  e1  e2
+	   0   1   2        0   1   2       0   1   2
+	*/
+
+	knownBy1 := cores[1].knownEvents()
+	if k := knownBy1[cores[0].validator.ID()]; k != 1 {
+		t.Fatalf("core 1 should have last-index 1 for core 0, not %d", k)
+	}
+	if k := knownBy1[cores[1].validator.ID()]; k != 1 {
+		t.Fatalf("core 1 should have last-index 1 for core 1, not %d", k)
+	}
+	if k := knownBy1[cores[2].validator.ID()]; k != 1 {
+		t.Fatalf("core 1 should have last-index 1 for core 2, not %d", k)
+	}
+	core1Head, _ := cores[1].getHead()
+	if core1Head.SelfParent() != index["e1"] {
+		t.Fatalf("core 1 head self-parent should be e1")
+	}
+	if core1Head.OtherParent() != index["e20"] {
+		t.Fatalf("core 1 head other-parent should be e20")
+	}
+	index["e12"] = core1Head.Hex()
+}
+
 /*
 h0  |   h2
 | \ | / |
