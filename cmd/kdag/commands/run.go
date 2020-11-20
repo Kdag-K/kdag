@@ -64,6 +64,11 @@ func runKdag(cmd *cobra.Command, args []string) error {
 * CONFIG
 *******************************************************************************/
 
+func initConfig(cmd *cobra.Command) error {
+	return viper.BindPFlag(_config.Kdag.BindAddr, cmd.PersistentFlags().Lookup(_config.Kdag.BindAdd))
+}
+
+
 //AddRunFlags adds flags to the Run command
 func AddRunFlags(cmd *cobra.Command) {
 

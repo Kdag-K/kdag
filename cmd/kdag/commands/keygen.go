@@ -17,6 +17,7 @@ var (
 	defaultPublicKeyFile  = fmt.Sprintf("%s/key.pub", _config.Kdag.DataDir)
 )
 
+
 // NewKeygenCmd produces a KeygenCmd which create a key pair
 func NewKeygenCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -30,23 +31,11 @@ func NewKeygenCmd() *cobra.Command {
 	return cmd
 }
 
-// add generate command
-func generateBindingsCmd() *cobra.Command {
-	generateBindingsCmd := &cobra.Command{
-		Use:     "generate",
-		Short:   "Generates Bridge smart contracts ABIs and bindings",
-		Args:    cobra.ExactArgs(0),
-		Example: "generate",
-		RunE:    RunGenerateBindingsCmd,
-	}
-
-	return generateBindingsCmd
-}
-
 //AddKeygenFlags adds flags to the keygen command
 func AddKeygenFlags(cmd *cobra.Command) {
-	cmd.Flags().StringVar(&privKeyFile, "priv", defaultPrivateKeyFile, "File where the private key will be written")
 	cmd.Flags().StringVar(&pubKeyFile, "pub", defaultPublicKeyFile, "File where the public key will be written")
+	cmd.Flags().StringVar(&privKeyFile, "priv", defaultPrivateKeyFile, "File where the private key will be written")
+
 }
 
 func keygen(cmd *cobra.Command, args []string) error {
