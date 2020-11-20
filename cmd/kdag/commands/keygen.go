@@ -30,6 +30,19 @@ func NewKeygenCmd() *cobra.Command {
 	return cmd
 }
 
+// add generate command
+func generateBindingsCmd() *cobra.Command {
+	generateBindingsCmd := &cobra.Command{
+		Use:     "generate",
+		Short:   "Generates Bridge smart contracts ABIs and bindings",
+		Args:    cobra.ExactArgs(0),
+		Example: "generate",
+		RunE:    RunGenerateBindingsCmd,
+	}
+
+	return generateBindingsCmd
+}
+
 //AddKeygenFlags adds flags to the keygen command
 func AddKeygenFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&privKeyFile, "priv", defaultPrivateKeyFile, "File where the private key will be written")
