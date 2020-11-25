@@ -5,6 +5,7 @@ type CLIConfig struct {
 	Name       string `mapstructure:"name"`
 	ClientAddr string `mapstructure:"client-listen"`
 	ProxyAddr  string `mapstructure:"proxy-connect"`
+        ProxyName  string `mapstructure:"proxy-name"`
 	Discard    bool   `mapstructure:"discard"`
 	LogLevel   string `mapstructure:"log"`
 }
