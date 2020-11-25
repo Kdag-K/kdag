@@ -125,6 +125,14 @@ func newLogger() *logrus.Logger {
 		pathMap[logrus.DebugLevel] = "dummy_debug.log"
 	}
 
+	if err == nil && config.Discard {
+		logger.Out = ioutil.Discard
+	}
+
+	logger.Hooks.Add(lfshook.NewHook(
+		pathMap,
+		&logrus.TextFormatter{},
+	))
 
 	return logger
 }
