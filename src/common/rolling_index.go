@@ -2,7 +2,9 @@ package common
 
 import "strconv"
 
-// RollingIndex ...
+// RollingIndex is a FIFO cache that evicts half of it's items when it reaches
+// full capacity. It contains items in strict sequential order where index is a
+// property of the items. It prevents skipping indexes when inserting new items.
 type RollingIndex struct {
 	name      string
 	size      int
@@ -10,22 +12,24 @@ type RollingIndex struct {
 	items     []interface{}
 }
 
-// NewRollingIndex ...
+// NewRollingIndex creates a new RollingIndex that contains up to size items.
 func NewRollingIndex(name string, size int) *RollingIndex {
 	return &RollingIndex{
 		name:      name,
 		size:      size,
-		items:     make([]interface{}, 0, 2*size),
+		items:     make([]interface{}, 0, size),
 		lastIndex: -1,
 	}
 }
 
-// GetLastWindow ...
+// GetLastWindow returns all the items contained in the cache and the index of
+// the last item.
 func (r *RollingIndex) GetLastWindow() (lastWindow []interface{}, lastIndex int) {
 	return r.items, r.lastIndex
 }
 
-// Get ...
+// Get returns all the items with index greater than skipIndex or a TooLate
+// error if some items have been evicted.
 func (r *RollingIndex) Get(skipIndex int) ([]interface{}, error) {
 	res := make([]interface{}, 0)
 
@@ -46,7 +50,8 @@ func (r *RollingIndex) Get(skipIndex int) ([]interface{}, error) {
 	return r.items[start:], nil
 }
 
-// GetItem ...
+// GetItem retrieves an item by index. It returns a TooLate error if the item
+// was evicted, or a KeyNotFound error if the item is not found.
 func (r *RollingIndex) GetItem(index int) (interface{}, error) {
 	items := len(r.items)
 	oldestCached := r.lastIndex - items + 1
