@@ -65,26 +65,29 @@ func (r *RollingIndex) GetItem(index int) (interface{}, error) {
 	return r.items[findex], nil
 }
 
-// Set ...
+// Set inserts an item and evicts the earlier half of the cache if it reached
+// full capacity. It returns a SkippedIndex error if the item's index is greater
+// than last index + 1. It allows setting items in place if the index
+// corresponds to an existing item.
 func (r *RollingIndex) Set(item interface{}, index int) error {
-	//only allow to setting items with index <= lastIndex + 1 so we may assume
-	//there are no gaps between items
+	// only allow setting items with index <= lastIndex + 1 so we may later
+	// assume that there are no gaps between items
 	if 0 <= r.lastIndex && index > r.lastIndex+1 {
 		return NewStoreErr(r.name, SkippedIndex, strconv.Itoa(index))
 	}
 
-	//adding a new item
+	// adding a new item
 	if r.lastIndex < 0 || (index == r.lastIndex+1) {
-		if len(r.items) >= 2*r.size {
-			r.Roll()
+		if len(r.items) >= r.size {
+			r.roll()
 		}
 		r.items = append(r.items, item)
 		r.lastIndex = index
 		return nil
 	}
 
-	//replace an existing item. Make sure index is also greater or equal than
-	//the oldest cached item's index
+	// replace an existing item. Make sure index is also greater or equal than
+	// the oldest cached item's index
 	cachedItems := len(r.items)
 	oldestCachedIndex := r.lastIndex - cachedItems + 1
 
@@ -92,16 +95,16 @@ func (r *RollingIndex) Set(item interface{}, index int) error {
 		return NewStoreErr(r.name, TooLate, strconv.Itoa(index))
 	}
 
-	//replacing existing item
-	position := index - oldestCachedIndex //position of 'index' in RollingIndex
+	// replacing existing item
+	position := index - oldestCachedIndex // position of 'index' in RollingIndex
 	r.items[position] = item
 
 	return nil
 }
 
-// Roll ...
-func (r *RollingIndex) Roll() {
-	newList := make([]interface{}, 0, 2*r.size)
-	newList = append(newList, r.items[r.size:]...)
+// roll evicts the earlier half of the cache and shifts the other half down.
+func (r *RollingIndex) roll() {
+	newList := make([]interface{}, 0, r.size)
+	newList = append(newList, r.items[r.size/2:]...)
 	r.items = newList
 }
