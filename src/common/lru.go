@@ -138,12 +138,12 @@ func (c *LRU) Len() int {
 }
 
 // removeOldest removes the oldest item from the cache.
-func (c *LRU) removeOldest() {
-	ent := c.evictList.Back()
-	if ent != nil {
-		c.removeElement(ent)
-	}
-}
+//func (c *LRU) removeOldest() {
+//	ent := c.evictList.Back()
+//	if ent != nil {
+//		c.removeElement(ent)
+//	}
+//}
 
 // removeElement is used to remove a given list element from the cache
 func (c *LRU) removeElement(e *list.Element) {
