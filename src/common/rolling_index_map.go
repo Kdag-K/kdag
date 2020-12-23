@@ -68,4 +68,23 @@ func (rim *RollingIndexMap) GetLast(key uint32) (interface{}, error) {
 	return cached[len(cached)-1], nil
 }
 
+// Set inserts or updates an item into a RollingIndex identified by key.
+func (rim *RollingIndexMap) Set(key uint32, item interface{}, index int) error {
+	items, ok := rim.mapping[key]
+	if !ok {
+		items = NewRollingIndex(fmt.Sprintf("%s[%d]", rim.name, key), rim.size)
+		rim.mapping[key] = items
+	}
+	return items.Set(item, index)
+}
+
+// Known returns a mapping of key to last known index.
+func (rim *RollingIndexMap) Known() map[uint32]int {
+	known := make(map[uint32]int)
+	for k, items := range rim.mapping {
+		_, lastIndex := items.GetLastWindow()
+		known[k] = lastIndex
+	}
+	return known
+}
 
