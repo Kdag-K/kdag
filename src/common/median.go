@@ -5,7 +5,7 @@ import (
 )
 
 // Median gets the median number in a slice of numbers
-func Median(input []int64) (median0 int64) {
+func Median(input []int64) (median int64) {
 
 	// Start by sorting a copy of the slice
 	s := make([]int64, len(input))
@@ -20,10 +20,10 @@ func Median(input []int64) (median0 int64) {
 		return 0
 	} else if l%2 == 0 {
 		mid := l/2 - 1
-		median0 = (s[mid] + s[mid+1]) / 2
+		median = (s[mid] + s[mid+1]) / 2
 	} else {
-		median0 = s[l/2]
+		median = s[l/2]
 	}
 
-	return median0
+	return median
 }
