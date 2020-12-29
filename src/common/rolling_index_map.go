@@ -56,8 +56,6 @@ func (rim *RollingIndexMap) GetItem(key uint32, index int) (interface{}, error) 
 }
 
 // GetLast returns the last item from a RolllingIndex indentified by key.
-
-// GetLast returns the last item from a RolllingIndex indentified by key.
 func (rim *RollingIndexMap) GetLast(key uint32) (interface{}, error) {
 	pe, ok := rim.mapping[key]
 	if !ok {
