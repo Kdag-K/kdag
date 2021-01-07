@@ -173,6 +173,15 @@ func (s *BadgerStore) RepertoireByPubKey() map[string]*peers.Peer {
 	return s.inmemStore.RepertoireByPubKey()
 }
 
+// RepertoireByID returns a map of peers by id.
+func (s *BadgerStore) RepertoireByID() map[uint32]*peers.Peer {
+	return s.inmemStore.RepertoireByID()
+}
+
+// LastEventFrom returns the hash of the last Event from a given participant.
+func (s *BadgerStore) LastEventFrom(participant string) (last string, err error) {
+	return s.inmemStore.LastEventFrom(participant)
+}
 
 // LastConsensusEventFrom returns the hash of the last consensus-event from a
 // given participant.
