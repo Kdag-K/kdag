@@ -168,6 +168,10 @@ func (s *BadgerStore) FirstRound(id uint32) (int, bool) {
 	return s.inmemStore.FirstRound(id)
 }
 
+// RepertoireByPubKey returns a map of peers by public-key.
+func (s *BadgerStore) RepertoireByPubKey() map[string]*peers.Peer {
+	return s.inmemStore.RepertoireByPubKey()
+}
 
 
 // LastConsensusEventFrom returns the hash of the last consensus-event from a
