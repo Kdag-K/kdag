@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 )
 
-// SHA256 ...
+// SHA256 returns the SHA256 hash of the data.
 func SHA256(data []byte) []byte {
 	hasher := sha256.New()
 	hasher.Write(data)
