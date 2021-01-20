@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Kdag-K/kdag/src/config"
 	"github.com/Kdag-K/kdag/src/net/signal/wamp"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
