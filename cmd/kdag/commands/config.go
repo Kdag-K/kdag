@@ -6,7 +6,7 @@ import (
 
 // CLIConfig contains configuration for the Run command
 type CLIConfig struct {
-	Kdag     config.Config `mapstructure:",squash"`
+	Kdag     config.Config   `mapstructure:",squash"`
 	ProxyAddr  string        `mapstructure:"proxy-listen"`
 	ClientAddr string        `mapstructure:"client-connect"`
 }
