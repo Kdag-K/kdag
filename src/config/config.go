@@ -170,13 +170,24 @@ type Config struct {
 	// attacks. This should be used only for testing.
 	SignalSkipVerify bool `mapstructure:"signal-skip-verify"`
 
-	// ICEServers defines a slice describing servers available to be used by
-	// ICE, such as STUN and TURN servers.
+	// ICE address is the URI of a server providing services for ICE, such as
+	// STUN and TURN. The server should support password-based authentication,
+	// as Babble will try to connect with the username and password provided in
+	// ICEUsername and ICEPassword below. Username adn password can also be
+	// empty if the ICE server does not use authentication.
 	// https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
-	ICEServers []webrtc.ICEServer
+	ICEAddress string `mapstructure:"ice-addr"`
 
-	// Proxy is the application proxy that enables Kdag to communicate with
-	// application.
+	// ICEUsername is the username that will be used to authenticate with the
+	// ICE server defined in ICEAddress.
+	ICEUsername string `mapstructure:"ice-username"`
+
+	// ICEPassword is the password that will be used to authenticate with the
+	// ICE server defined in ICEAddress.
+	ICEPassword string `mapstructure:"ice-password"`
+
+	// Proxy is the application proxy that enables Babble to communicate with
+	// the application.
 	Proxy proxy.AppGateway
 
 	// Key is the private key of the validator.
