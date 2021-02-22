@@ -9,3 +9,13 @@ type Group struct {
 	Peers        []*peers.Peer
 	GenesisPeers []*peers.Peer
 }
+// NewGroup generates a new Group
+func NewGroup(id string, name string, appID string, peers []*peers.Peer) *Group {
+	return &Group{
+		ID:           id,
+		Name:         name,
+		AppID:        appID,
+		Peers:        peers,
+		GenesisPeers: peers,
+	}
+}
