@@ -1,6 +1,7 @@
 package group
+
 import (
-	"github.com/Kdag-K/kdag/src/peers"
+	"fmt"
 	"sync"
 )
 // InmemGroupRepo implements the GroupRepo interface with an inmem
@@ -28,31 +29,6 @@ func NewInmemGroupRepo() *InmemGroupRepo {
 	}
 }
 
-func TestGetGroups() {
-	repo := NewInmemGroupRepo()
-
-	group1 := NewGroup(
-		"",
-		"TestGroup1",
-		"TestApp1",
-		[]*peers.Peer{
-			peers.NewPeer("pub1", "net1", "peer1"),
-		},
-	)
-
-	group2 := NewGroup(
-		"",
-		"TestGroup2",
-		"TestApp2",
-		[]*peers.Peer{
-			peers.NewPeer("pub1", "net1", "peer1"),
-		},
-	)
-
-	allGroups,_  := repo.GetAllGroups()
-
-}
-
 // GetAllGroups implements the GroupRepo interface and returns all the
 // groups
 func (igr *InmemGroupRepo) GetAllGroups() (map[string]*Group, error) {
@@ -60,4 +36,16 @@ func (igr *InmemGroupRepo) GetAllGroups() (map[string]*Group, error) {
 	defer igr.Unlock()
 
 	return igr.groupsByID, nil
+}
+
+// GetGroup implements the GroupRepo interface and returns a group by ID
+func (igr *InmemGroupRepo) GetGroup(id string) (*Group, error) {
+	igr.Lock()
+	defer igr.Unlock()
+
+	g, ok := igr.groupsByID[id]
+	if !ok {
+		return nil, fmt.Errorf("Group %s not found", id)
+	}
+	return g, nil
 }
