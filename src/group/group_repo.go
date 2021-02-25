@@ -19,6 +19,13 @@ type GroupRepo interface {
 	SetGroup(group *Group) (string, error)
 	DeleteGroup(groupID string) error
 }
+// NewInmemGroupRepo instantiates a new InmemGroupRepo
+func NewInmemGroupRepository() *InmemGroupRepo {
+	return &InmemGroupRepo{
+		groupsByID:    make(map[string]*Group),
+		groupsByAppID: make(map[string][]string),
+	}
+}
 
 // GetAllGroups implements the GroupRepo interface and returns all the
 // groups
