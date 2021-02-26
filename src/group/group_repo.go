@@ -49,3 +49,24 @@ func (igr *InmemGroupRepo) GetGroup(id string) (*Group, error) {
 	}
 	return g, nil
 }
+// GetAllGroupsByAppID implements the GroupRepo interface and returns all
+// the groups associated with an AppID
+func (igr *InmemGroupRepo) GetAllGroupsByAppID(appID string) (map[string]*Group, error) {
+	igr.Lock()
+	defer igr.Unlock()
+
+	res := make(map[string]*Group)
+
+	appGroups, ok := igr.groupsByAppID[appID]
+	if !ok {
+		return res, nil
+	}
+
+	for _, gid := range appGroups {
+		res[gid] = igr.groupsByID[gid]
+		println ( " gid : " + gid)
+		println(res[gid])
+	}
+
+	return res, nil
+}
