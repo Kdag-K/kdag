@@ -70,3 +70,63 @@ func (igr *InmemGroupRepo) GetAllGroupsByAppID(appID string) (map[string]*Group,
 
 	return res, nil
 }
+
+// createAndStartTURNServer configures and runs the TURN server.
+func createAndStartTURNServer(
+	turnAddr string,
+	turnUsername string,
+	turnPassword string,
+	realm string) (*turn.Server, error) {
+
+	// Populate the map of authorised users with the single user defined by
+	// turnUsername and turnPassword.
+	usersMap := map[string][]byte{}
+	usersMap[turnUsername] = turn.GenerateAuthKey(turnUsername, realm, turnPassword)
+
+	// Split the turnAddr into IP and Port.
+	split := strings.Split(turnAddr, ":")
+	if len(split) != 2 {
+		return nil, fmt.Errorf("Invalid ICE address format")
+	}
+	bindAddr := split[0]
+	icePort := split[1]
+
+	// Create a UDP listener to pass into pion/turn
+	udpListener, err := net.ListenPacket("udp4", "0.0.0.0:"+icePort)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to create TURN server listener: %s", err)
+	}
+
+	// Override the default log level
+	logFactory := logging.NewDefaultLoggerFactory()
+	logFactory.DefaultLogLevel = logging.LogLevelInfo
+
+	s, err := turn.NewServer(turn.ServerConfig{
+		Realm: realm,
+		// Set AuthHandler callback
+		// This is called everytime a user tries to authenticate with the TURN
+		// server. Return the key for that user, or false when no user is found
+		AuthHandler: func(username string, realm string, srcAddr net.Addr) ([]byte, bool) {
+			if key, ok := usersMap[username]; ok {
+				return key, true
+			}
+			return nil, false
+		},
+		// PacketConnConfigs is a list of UDP Listeners and the configuration around them
+		PacketConnConfigs: []turn.PacketConnConfig{
+			{
+				PacketConn: udpListener,
+				RelayAddressGenerator: &turn.RelayAddressGeneratorStatic{
+					RelayAddress: net.ParseIP(bindAddr), // Claim that we are listening on IP passed by user (This should be your Public IP)
+					Address:      "0.0.0.0",             // But actually be listening on every interface
+				},
+			},
+		},
+		LoggerFactory: logFactory,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("Fail to create TURN server: %s", err)
+	}
+
+	return s, nil
+}
