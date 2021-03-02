@@ -2,6 +2,9 @@ package group
 
 import (
 	"fmt"
+	"github.com/pion/logging"
+	"github.com/pion/turn/v2"
+	"net"
 	"sync"
 )
 // InmemGroupRepo implements the GroupRepo interface with an inmem
@@ -100,33 +103,6 @@ func createAndStartTURNServer(
 	// Override the default log level
 	logFactory := logging.NewDefaultLoggerFactory()
 	logFactory.DefaultLogLevel = logging.LogLevelInfo
-
-	s, err := turn.NewServer(turn.ServerConfig{
-		Realm: realm,
-		// Set AuthHandler callback
-		// This is called everytime a user tries to authenticate with the TURN
-		// server. Return the key for that user, or false when no user is found
-		AuthHandler: func(username string, realm string, srcAddr net.Addr) ([]byte, bool) {
-			if key, ok := usersMap[username]; ok {
-				return key, true
-			}
-			return nil, false
-		},
-		// PacketConnConfigs is a list of UDP Listeners and the configuration around them
-		PacketConnConfigs: []turn.PacketConnConfig{
-			{
-				PacketConn: udpListener,
-				RelayAddressGenerator: &turn.RelayAddressGeneratorStatic{
-					RelayAddress: net.ParseIP(bindAddr), // Claim that we are listening on IP passed by user (This should be your Public IP)
-					Address:      "0.0.0.0",             // But actually be listening on every interface
-				},
-			},
-		},
-		LoggerFactory: logFactory,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("Fail to create TURN server: %s", err)
-	}
 
 	return s, nil
 }
