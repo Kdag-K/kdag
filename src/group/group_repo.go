@@ -6,6 +6,7 @@ import (
 	"github.com/pion/turn/v2"
 	"net"
 	"sync"
+	"time"
 )
 // InmemGroupRepo implements the GroupRepo interface with an inmem
 // map of groups. It is thread safe.
@@ -73,7 +74,22 @@ func (igr *InmemGroupRepo) GetAllGroupsByAppID(appID string) (map[string]*Group,
 
 	return res, nil
 }
+func (igr *InmemGroupRepo) SetGroup(group *Group) (string, error) {
+	if group.AppID == "" {
+		return "", fmt.Errorf("Group AppID not specified")
+	}
 
+	if group.ID == "" {
+		group.ID = uuid.New().String()
+	}
+
+	group.LastUpdated = time.Now().Unix()
+
+	igr.Lock()
+	defer igr.Unlock()
+
+	return group.ID, nil
+}
 // createAndStartTURNServer configures and runs the TURN server.
 func createAndStartTURNServer(
 	turnAddr string,
