@@ -5,6 +5,7 @@ import (
 	"github.com/pion/logging"
 	"github.com/pion/turn/v2"
 	"net"
+	"strings"
 	"sync"
 	"time"
 )
@@ -89,36 +90,4 @@ func (igr *InmemGroupRepo) SetGroup(group *Group) (string, error) {
 	defer igr.Unlock()
 
 	return group.ID, nil
-}
-// createAndStartTURNServer configures and runs the TURN server.
-func createAndStartTURNServer(
-	turnAddr string,
-	turnUsername string,
-	turnPassword string,
-	realm string) (*turn.Server, error) {
-
-	// Populate the map of authorised users with the single user defined by
-	// turnUsername and turnPassword.
-	usersMap := map[string][]byte{}
-	usersMap[turnUsername] = turn.GenerateAuthKey(turnUsername, realm, turnPassword)
-
-	// Split the turnAddr into IP and Port.
-	split := strings.Split(turnAddr, ":")
-	if len(split) != 2 {
-		return nil, fmt.Errorf("Invalid ICE address format")
-	}
-	bindAddr := split[0]
-	icePort := split[1]
-
-	// Create a UDP listener to pass into pion/turn
-	udpListener, err := net.ListenPacket("udp4", "0.0.0.0:"+icePort)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create TURN server listener: %s", err)
-	}
-
-	// Override the default log level
-	logFactory := logging.NewDefaultLoggerFactory()
-	logFactory.DefaultLogLevel = logging.LogLevelInfo
-
-	return s, nil
 }
