@@ -2,12 +2,9 @@ package group
 
 import (
 	"fmt"
-	"github.com/pion/logging"
-	"github.com/pion/turn/v2"
-	"net"
-	"strings"
 	"sync"
 	"time"
+	"github.com/google/uuid"
 )
 // InmemGroupRepo implements the GroupRepo interface with an inmem
 // map of groups. It is thread safe.
