@@ -94,5 +94,7 @@ func (igr *InmemGroupRepo) SetGroup(group *Group) (string, error) {
 		appGroups = append(appGroups, group.ID)
 		igr.groupsByAppID[group.AppID] = appGroups
 	}
+	// Set group in main index
+	igr.groupsByID[group.ID] = group
 	return group.ID, nil
 }
