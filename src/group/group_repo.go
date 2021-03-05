@@ -85,6 +85,14 @@ func (igr *InmemGroupRepo) SetGroup(group *Group) (string, error) {
 
 	igr.Lock()
 	defer igr.Unlock()
-
+	// If the group does not exist, add it to the AppID index
+	if _, gok := igr.groupsByID[group.ID]; !gok {
+		appGroups, aok := igr.groupsByAppID[group.AppID]
+		if !aok {
+			appGroups = []string{}
+		}
+		appGroups = append(appGroups, group.ID)
+		igr.groupsByAppID[group.AppID] = appGroups
+	}
 	return group.ID, nil
 }

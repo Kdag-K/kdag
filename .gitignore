@@ -1,7 +1,9 @@
 # IDE
 .vscode
 .idea/
-
+.DS_Store
+*/*.DS_Store
+.gitconfig
 # Go test output
 */*.test
 */*.out
