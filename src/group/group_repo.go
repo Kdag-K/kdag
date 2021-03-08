@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
 	"github.com/google/uuid"
 )
+
 // InmemGroupRepo implements the GroupRepo interface with an inmem
 // map of groups. It is thread safe.
 type InmemGroupRepo struct {
@@ -23,6 +25,7 @@ type GroupRepo interface {
 	SetGroup(group *Group) (string, error)
 	DeleteGroup(groupID string) error
 }
+
 // NewInmemGroupRepo instantiates a new InmemGroupRepo
 func NewInmemGroupRepo() *InmemGroupRepo {
 	return &InmemGroupRepo{
@@ -51,6 +54,7 @@ func (igr *InmemGroupRepo) GetGroup(id string) (*Group, error) {
 	}
 	return g, nil
 }
+
 // GetAllGroupsByAppID implements the GroupRepo interface and returns all
 // the groups associated with an AppID
 func (igr *InmemGroupRepo) GetAllGroupsByAppID(appID string) (map[string]*Group, error) {
@@ -66,7 +70,7 @@ func (igr *InmemGroupRepo) GetAllGroupsByAppID(appID string) (map[string]*Group,
 
 	for _, gid := range appGroups {
 		res[gid] = igr.groupsByID[gid]
-		println ( " gid : " + gid)
+		println(" gid : " + gid)
 		println(res[gid])
 	}
 
