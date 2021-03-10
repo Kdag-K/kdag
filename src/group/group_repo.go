@@ -102,3 +102,19 @@ func (igr *InmemGroupRepo) SetGroup(group *Group) (string, error) {
 	igr.groupsByID[group.ID] = group
 	return group.ID, nil
 }
+
+// DeleteGroup implements the GroupRepo interface and removes a group from
+// the map
+func (igr *InmemGroupRepo) DeleteGroup(id string) error {
+	igr.Lock()
+	defer igr.Unlock()
+	// If the group exists, remove it from the AppID index
+	if g, gok := igr.groupsByID[id]; gok {
+		appGroups, aok := igr.groupsByAppID[g.AppID]
+		if aok {
+
+		}
+	}
+	delete(igr.groupsByID, id)
+	return nil
+}
