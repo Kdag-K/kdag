@@ -112,7 +112,7 @@ func (igr *InmemGroupRepo) DeleteGroup(id string) error {
 	if g, gok := igr.groupsByID[id]; gok {
 		appGroups, aok := igr.groupsByAppID[g.AppID]
 		if aok {
-
+			igr.groupsByAppID[g.AppID] = appGroups
 		}
 	}
 	delete(igr.groupsByID, id)
