@@ -23,7 +23,7 @@ type GroupRepo interface {
 	GetAllGroupsByAppID(appID string) (map[string]*Group, error)
 	GetGroup(groupID string) (*Group, error)
 	SetGroup(group *Group) (string, error)
-	DeleteGroup(groupID string) error
+	DelGroup(groupID string) error
 }
 
 // NewInmemGroupRepo instantiates a new InmemGroupRepo
@@ -103,9 +103,9 @@ func (igr *InmemGroupRepo) SetGroup(group *Group) (string, error) {
 	return group.ID, nil
 }
 
-// DeleteGroup implements the GroupRepo interface and removes a group from
+// DelGroup implements the GroupRepo interface and removes a group from
 // the map
-func (igr *InmemGroupRepo) DeleteGroup(id string) error {
+func (igr *InmemGroupRepo) DelGroup(id string) error {
 	igr.Lock()
 	defer igr.Unlock()
 	// If the group exists, remove it from the AppID index
