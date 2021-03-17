@@ -118,3 +118,14 @@ func (igr *InmemGroupRepo) DelGroup(id string) error {
 	delete(igr.groupsByID, id)
 	return nil
 }
+
+// GetAllGroupsByAppID implements the GroupRepo interface and returns all
+// the groups associated with an AppID
+func (igr *InmemGroupRepo) GetAllGroupsByAppID(appID string) (map[string]*Group, error) {
+	igr.Lock()
+	defer igr.Unlock()
+
+	res := make(map[string]*Group)
+
+	return res, nil
+}
