@@ -126,8 +126,10 @@ func (igr *InmemGroupRepo) GetAllGroupsByAppID(appID string) (map[string]*Group,
 	defer igr.Unlock()
 
 	res := make(map[string]*Group)
-	appGroups, _ := igr.groupsByAppID[appID]
-
+	appGroups, ok := igr.groupsByAppID[appID]
+	if !ok {
+		return res, nil
+	}
 	for _, gid := range appGroups {
 		res[gid] = igr.groupsByID[gid]
 	}
