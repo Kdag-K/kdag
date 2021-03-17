@@ -67,3 +67,30 @@ func TestSetGroup(t *testing.T) {
 		t.Fatalf("group LastUpdated should have increased")
 	}
 }
+func TestDelGroup(t *testing.T) {
+	repo := NewInmemGroupRepo()
+
+	group := NewGroup(
+		"",
+		"TestGroup",
+		"TestApp",
+		[]*peers.Peer{
+			peers.NewPeer("pub1", "net1", "peer1"),
+		},
+	)
+
+	groupID, err := repo.SetGroup(group)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = repo.DelGroup(groupID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	retrievedGroup, err := repo.GetGroup(groupID)
+	if retrievedGroup != nil || err == nil {
+		t.Fatalf("Retrieving deleted group should be return nil and error")
+	}
+}
