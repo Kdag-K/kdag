@@ -59,5 +59,11 @@ func TestSetGroup(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if !reflect.DeepEqual(group, retrievedGroup2) {
+		t.Fatalf("Retrieved group should be %#v, not %#v", group, retrievedGroup2)
+	}
 
+	if retrievedGroup2.LastUpdated < time {
+		t.Fatalf("group LastUpdated should have increased")
+	}
 }
