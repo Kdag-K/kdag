@@ -109,24 +109,24 @@ func TestGetGroups(t *testing.T) {
 		},
 	)
 
-	//group2 := NewGroup(
-	//	"",
-	//	"TestGroup2",
-	//	"TestApp2",
-	//	[]*peers.Peer{
-	//		peers.NewPeer("pub1", "net1", "peer1"),
-	//	},
-	//)
+	group2 := NewGroup(
+		"",
+		"TestGroup2",
+		"TestApp2",
+		[]*peers.Peer{
+			peers.NewPeer("pub1", "net1", "peer1"),
+		},
+	)
 
 	_, err := repo.SetGroup(group1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	//_, err = repo.SetGroup((group2))
-	//if err != nil {
-	//	t.Fatal(err)
-	//}
+	_, err = repo.SetGroup((group2))
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	allGroups, err := repo.GetAllGroups()
 	if err != nil {
