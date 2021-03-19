@@ -94,3 +94,64 @@ func TestDelGroup(t *testing.T) {
 		t.Fatalf("Retrieving deleted group should be return nil and error")
 	}
 }
+
+// Test inserting groups with different AppIDs and fetching all groups or groups
+// by AppID.
+func TestGetGroups(t *testing.T) {
+	repo := NewInmemGroupRepo()
+
+	group1 := NewGroup(
+		"",
+		"TestGroup1",
+		"TestApp1",
+		[]*peers.Peer{
+			peers.NewPeer("pub1", "net1", "peer1"),
+		},
+	)
+
+	//group2 := NewGroup(
+	//	"",
+	//	"TestGroup2",
+	//	"TestApp2",
+	//	[]*peers.Peer{
+	//		peers.NewPeer("pub1", "net1", "peer1"),
+	//	},
+	//)
+
+	_, err := repo.SetGroup(group1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//_, err = repo.SetGroup((group2))
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+
+	allGroups, err := repo.GetAllGroups()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(allGroups) != 2 {
+		t.Fatalf("Repo should contain 2 groups, not %d", len(allGroups))
+	}
+
+	app1Groups, err := repo.GetAllGroupsByAppID("TestApp1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(app1Groups) != 1 {
+		t.Fatalf("App1 should contain 1 group, not %d", len(app1Groups))
+	}
+
+	app2Groups, err := repo.GetAllGroupsByAppID("TestApp2")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(app2Groups) != 1 {
+		t.Fatalf("App2 should contain 1 group, not %d", len(app2Groups))
+	}
+}
