@@ -9,8 +9,8 @@ type CLIConfig struct {
 	LogLevel   string `mapstructure:"log"`
 }
 
-//NewDefaultCLIConfig creates a CLIConfig with default values
-func NewDefaultCLIConfig() *CLIConfig {
+//NewDefaultCLIConf creates a CLIConfig with default values
+func NewDefaultCLIConf() *CLIConfig {
 	return &CLIConfig{
 		Name:       "Dummy",
 		ClientAddr: "127.0.0.1:1339",
