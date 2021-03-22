@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	_config = NewDefaultCLIConfig()
+	_config = NewDefaultCLIConf()
 )
 
 // RootCmd is the root command for Kdag
