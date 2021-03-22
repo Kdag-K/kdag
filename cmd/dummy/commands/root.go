@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	config = NewDefaultCLIConfig()
+	config = NewDefaultCLIConf()
 	logger *logrus.Logger
 )
 
@@ -98,7 +98,7 @@ func loadConfig(cmd *cobra.Command, args []string) error {
 
 //Retrieve the default environment configuration.
 func parseConfig() (*CLIConfig, error) {
-	conf := NewDefaultCLIConfig()
+	conf := NewDefaultCLIConf()
 	err := viper.Unmarshal(conf)
 	if err != nil {
 		return nil, err
