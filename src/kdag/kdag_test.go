@@ -19,7 +19,7 @@ func TestInitStore(t *testing.T) {
 	os.Mkdir("test_data", os.ModeDir|0777)
 	defer os.RemoveAll("test_data")
 
-	conf := config.NewDefaultConfig()
+	conf := config.NewDefaultConf()
 	conf.SetDataDir("test_data")
 	conf.Store = true
 	conf.Bootstrap = false
@@ -101,7 +101,7 @@ func TestMaintenanceMode(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	conf := config.NewDefaultConfig()
+	conf := config.NewDefaultConf()
 	conf.SetDataDir("test_data")
 	conf.MaintenanceMode = true
 	conf.Key = keys["addr0"]
