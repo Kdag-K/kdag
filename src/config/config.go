@@ -196,11 +196,11 @@ type Config struct {
 	logger *logrus.Logger
 }
 
-// NewDefaultConfig returns a config object with default values. All the default
+// NewDefaultConf returns a config object with default values. All the default
 // configuration values are set, even if they cancel eachother out. For example,
 // When WebRTC = false, all the Signal options are ignored. Likewise, when
 // WebRTC = true, BindAddr and ServiceAddr are not used.
-func NewDefaultConfig() *Config {
+func NewDefaultConf() *Config {
 	config := &Config{
 		DataDir:              DefaultDataDir(),
 		LogLevel:             DefaultLogLevel,
@@ -232,7 +232,7 @@ func NewDefaultConfig() *Config {
 // NewTestConfig returns a config object with default values and a special
 // logger for debugging tests.
 func NewTestConfig(t testing.TB, level logrus.Level) *Config {
-	config := NewDefaultConfig()
+	config := NewDefaultConf()
 	config.logger = common.NewTestLogger(t, level)
 	return config
 }
@@ -258,6 +258,7 @@ func (c *Config) Keyfile() string {
 func (c *Config) CertFile() string {
 	return filepath.Join(c.DataDir, DefaultCertFile)
 }
+
 // ICEServers returns a list of ICE servers used by the WebRTCStreamLayer to
 // connect to peers. The list contains a single item which is based on the
 // configuration passed through the config object. This configuration is limited
@@ -272,6 +273,7 @@ func (c *Config) ICEServers() []webrtc.ICEServer {
 		},
 	}
 }
+
 // Logger returns a formatted logrus Entry, with prefix set to "babble".
 func (c *Config) Logger() *logrus.Entry {
 	if c.logger == nil {
