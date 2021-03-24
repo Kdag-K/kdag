@@ -232,9 +232,9 @@ func NewDefaultConf() *Config {
 // NewTestConfig returns a config object with default values and a special
 // logger for debugging tests.
 func NewTestConfig(t testing.TB, level logrus.Level) *Config {
-	config := NewDefaultConf()
-	config.logger = common.NewTestLogger(t, level)
-	return config
+	conf := NewDefaultConf()
+	conf.logger = common.NewTestLogger(t, level)
+	return conf
 }
 
 // SetDataDir sets the top-level Kdag directory, and updates the database
