@@ -1,8 +1,8 @@
 BUILD_TAGS?=kdag
 
-# vendor installs all the Go dependencies in vendor/
-vendor:
-	(rm -rf vendor ) && GO111MODULE=on go mod vendor
+## vendor installs all the Go dependencies in vendor/
+#vendor:
+#	(rm -rf vendor ) && GO111MODULE=on go mod vendor
 
 # install compiles and places the binary in GOPATH/bin
 install:
