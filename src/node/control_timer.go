@@ -37,7 +37,7 @@ func newRandomControlTimer() *controlTimer {
 		if min == 0 {
 			return nil
 		}
-		extra := (time.Duration(rand.Int63()) % min)
+		extra := time.Duration(rand.Int63()) % min
 		return time.After(min + extra)
 	}
 	return newControlTimer(randomTimeout)
