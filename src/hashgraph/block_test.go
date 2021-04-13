@@ -19,7 +19,9 @@ func createTestBlock() *Block {
 		[]InternalTransaction{
 			NewInternalTransaction(PEER_ADD, *peers.NewPeer("peer1", "paris", "peer1")),
 			NewInternalTransaction(PEER_REMOVE, *peers.NewPeer("peer2", "london", "peer2")),
-		})
+		},
+		0,
+	)
 
 	receipts := []InternalTransactionReceipt{}
 	for _, itx := range block.InternalTransactions() {
