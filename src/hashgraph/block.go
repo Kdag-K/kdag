@@ -12,19 +12,20 @@ import (
 	"github.com/Kdag-K/kdag/src/peers"
 )
 
-// BlockBody ...
+// BlockBody is the content of a Block.
 type BlockBody struct {
-	Index                       int
-	RoundReceived               int
-	StateHash                   []byte
-	FrameHash                   []byte
-	PeersHash                   []byte
-	Transactions                [][]byte
-	InternalTransactions        []InternalTransaction
-	InternalTransactionReceipts []InternalTransactionReceipt
+	Index                       int                          // block index
+	RoundReceived               int                          // round received of corresponding hashgraph frame
+	Timestamp                   int64                        // unix timestamp ((median of timestamps in round-received famous witnesses))
+	StateHash                   []byte                       // root hash of the application after applying block payload; to be populated by application Commit
+	FrameHash                   []byte                       // hash of corresponding hashgraph frame
+	PeersHash                   []byte                       // hash of peer-set
+	Transactions                [][]byte                     // transaction payload
+	InternalTransactions        []InternalTransaction        // internal transaction payload (add/remove peers)
+	InternalTransactionReceipts []InternalTransactionReceipt // receipts for internal transactions; to be populated by application Commit
 }
 
-//Marshal - json encoding of body only
+// Marshal produces the JSON encoding of a BlockBody.
 func (bb *BlockBody) Marshal() ([]byte, error) {
 	bf := bytes.NewBuffer([]byte{})
 	enc := json.NewEncoder(bf)
@@ -34,7 +35,7 @@ func (bb *BlockBody) Marshal() ([]byte, error) {
 	return bf.Bytes(), nil
 }
 
-// Unmarshal ...
+// Unmarshal parses a JSON encoded BlockBody.
 func (bb *BlockBody) Unmarshal(data []byte) error {
 	b := bytes.NewBuffer(data)
 	dec := json.NewDecoder(b) //will read from b
@@ -44,7 +45,7 @@ func (bb *BlockBody) Unmarshal(data []byte) error {
 	return nil
 }
 
-// Hash ...
+// Hash produces the SHA256 hash of the marshalled BlockBody.
 func (bb *BlockBody) Hash() ([]byte, error) {
 	hashBytes, err := bb.Marshal()
 	if err != nil {
@@ -53,10 +54,14 @@ func (bb *BlockBody) Hash() ([]byte, error) {
 	return crypto.SHA256(hashBytes), nil
 }
 
-// BlockSignature ...
+// BlockSignature gathers a signature encoded as a string, along with the index
+// of the block, and the public-key of the signer.
 type BlockSignature struct {
+	// Validator is the public key of the signer.
 	Validator []byte
-	Index     int //Block Index
+	// Block Index
+	Index int
+	// String encoding of the signature
 	Signature string
 }
 
@@ -85,7 +90,7 @@ func (bs *BlockSignature) Unmarshal(data []byte) error {
 	return nil
 }
 
-// ToWire ...
+// ToWire returns the wire representation of a BlockSignature.
 func (bs *BlockSignature) ToWire() WireBlockSignature {
 	return WireBlockSignature{
 		Index:     bs.Index,
@@ -93,18 +98,29 @@ func (bs *BlockSignature) ToWire() WireBlockSignature {
 	}
 }
 
-// Key ...
+// Key produces a string identifier of the signature for storage in a key-value
+// store.
 func (bs *BlockSignature) Key() string {
 	return fmt.Sprintf("%d-%s", bs.Index, bs.ValidatorHex())
 }
 
-// WireBlockSignature ...
+// WireBlockSignature is a light-weight representation of a signature to travel
+// over the wire.
 type WireBlockSignature struct {
 	Index     int
 	Signature string
 }
 
-// Block ...
+// Block represents a section of the Hashgraph that has reached consensus. It
+// contains an ordered list of transactions and internal transactions. When a
+// section of the hashgraph reaches consensus, a corresponding block is
+// assembled and committed to the application. After processing the block, the
+// application updates the block's state-hash and internal transaction receipts.
+// The block is then signed and the signatures are gossipped and gathered as
+// part of the normal gossip routines. A block with enough signatures is final;
+// it is a self-contained proof that a section of the hashgraph and the
+// associated transactions are a result of consensus among the prevailing peer-
+// set.
 type Block struct {
 	Body       BlockBody
 	Signatures map[string]string // [validator hex] => signature
@@ -114,7 +130,7 @@ type Block struct {
 	peerSet *peers.PeerSet
 }
 
-// NewBlockFromFrame ...
+// NewBlockFromFrame assembles a block from a Frame.
 func NewBlockFromFrame(blockIndex int, frame *Frame) (*Block, error) {
 	frameHash, err := frame.Hash()
 	if err != nil {
@@ -128,10 +144,19 @@ func NewBlockFromFrame(blockIndex int, frame *Frame) (*Block, error) {
 		internalTransactions = append(internalTransactions, e.Core.InternalTransactions()...)
 	}
 
-	return NewBlock(blockIndex, frame.Round, frameHash, frame.Peers, transactions, internalTransactions), nil
+	block := NewBlock(
+		blockIndex,
+		frame.Round,
+		frameHash,
+		frame.Peers,
+		transactions,
+		internalTransactions,
+		frame.Timestamp)
+
+	return block, nil
 }
 
-// NewBlock ...
+// NewBlock creates a new Block.
 func NewBlock(blockIndex,
 	roundReceived int,
 	frameHash []byte,
@@ -154,6 +179,7 @@ func NewBlock(blockIndex,
 		PeersHash:            peersHash,
 		Transactions:         txs,
 		InternalTransactions: itxs,
+		Timestamp:            timestamp,
 	}
 
 	return &Block{
