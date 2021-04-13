@@ -65,12 +65,13 @@ type BlockSignature struct {
 	Signature string
 }
 
-// ValidatorHex ...
+// ValidatorHex returns the hex string representation of the signer's public
+// key.
 func (bs *BlockSignature) ValidatorHex() string {
 	return common.EncodeToString(bs.Validator)
 }
 
-// Marshal ...
+// Marshal produces the JSON encoding of the BlockSignature.
 func (bs *BlockSignature) Marshal() ([]byte, error) {
 	bf := bytes.NewBuffer([]byte{})
 	enc := json.NewEncoder(bf)
@@ -80,7 +81,7 @@ func (bs *BlockSignature) Marshal() ([]byte, error) {
 	return bf.Bytes(), nil
 }
 
-// Unmarshal ...
+// Unmarshal parses a BlockSignature from JSON.
 func (bs *BlockSignature) Unmarshal(data []byte) error {
 	b := bytes.NewBuffer(data)
 	dec := json.NewDecoder(b) //will read from b
@@ -189,47 +190,53 @@ func NewBlock(blockIndex,
 	}
 }
 
-// Index ...
+// Index returns the block's index.
 func (b *Block) Index() int {
 	return b.Body.Index
 }
 
-// Transactions ...
+// Timestamp returns the block's timestamp
+func (b *Block) Timestamp() int64 {
+	return b.Body.Timestamp
+}
+
+// Transactions return's the block's transactoins.
 func (b *Block) Transactions() [][]byte {
 	return b.Body.Transactions
 }
 
-// InternalTransactions ...
+// InternalTransactions returns the block's internal transactions.
 func (b *Block) InternalTransactions() []InternalTransaction {
 	return b.Body.InternalTransactions
 }
 
-// InternalTransactionReceipts ...
+// InternalTransactionReceipts returns the block's internal transaction
+// receipts.
 func (b *Block) InternalTransactionReceipts() []InternalTransactionReceipt {
 	return b.Body.InternalTransactionReceipts
 }
 
-// RoundReceived ...
+// RoundReceived returns the block's round-received.
 func (b *Block) RoundReceived() int {
 	return b.Body.RoundReceived
 }
 
-// StateHash ...
+// StateHash returns the block's state hash.
 func (b *Block) StateHash() []byte {
 	return b.Body.StateHash
 }
 
-// FrameHash ...
+// FrameHash returns the block's frame hash.
 func (b *Block) FrameHash() []byte {
 	return b.Body.FrameHash
 }
 
-// PeersHash ...
+// PeersHash returns the block's peers hash.
 func (b *Block) PeersHash() []byte {
 	return b.Body.PeersHash
 }
 
-// GetSignatures ...
+// GetSignatures returns the block's signatures.
 func (b *Block) GetSignatures() []BlockSignature {
 	res := make([]BlockSignature, len(b.Signatures))
 	i := 0
@@ -275,7 +282,7 @@ func (b *Block) Marshal() ([]byte, error) {
 	return bf.Bytes(), nil
 }
 
-// Unmarshal ...
+// Unmarshal parses a JSON encoded Block.
 func (b *Block) Unmarshal(data []byte) error {
 	bf := bytes.NewBuffer(data)
 	dec := json.NewDecoder(bf)
