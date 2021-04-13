@@ -163,7 +163,8 @@ func NewBlock(blockIndex,
 	frameHash []byte,
 	peerSlice []*peers.Peer,
 	txs [][]byte,
-	itxs []InternalTransaction) *Block {
+	itxs []InternalTransaction,
+	timestamp int64) *Block {
 
 	peerSet := peers.NewPeerSet(peerSlice)
 
@@ -292,7 +293,7 @@ func (b *Block) Unmarshal(data []byte) error {
 	return nil
 }
 
-// Hash ...
+// Hash returns the SHA256 encoding of a marshalled block.
 func (b *Block) Hash() ([]byte, error) {
 	if len(b.hash) == 0 {
 		hashBytes, err := b.Marshal()
@@ -304,7 +305,7 @@ func (b *Block) Hash() ([]byte, error) {
 	return b.hash, nil
 }
 
-// Hex ...
+// Hex returns the hex string representations of the block's hash.
 func (b *Block) Hex() string {
 	if b.hex == "" {
 		hash, _ := b.Hash()
@@ -313,7 +314,7 @@ func (b *Block) Hex() string {
 	return b.hex
 }
 
-// Sign ...
+// Sign returns the signature of the hash of the block's body.
 func (b *Block) Sign(privKey *ecdsa.PrivateKey) (bs BlockSignature, err error) {
 	signBytes, err := b.Body.Hash()
 	if err != nil {
@@ -332,13 +333,13 @@ func (b *Block) Sign(privKey *ecdsa.PrivateKey) (bs BlockSignature, err error) {
 	return signature, nil
 }
 
-// SetSignature ...
+// SetSignature appends a signature to the block.
 func (b *Block) SetSignature(bs BlockSignature) error {
 	b.Signatures[bs.ValidatorHex()] = bs.Signature
 	return nil
 }
 
-// Verify ...
+// Verify verifies that a signature is valid against the block.
 func (b *Block) Verify(sig BlockSignature) (bool, error) {
 	signBytes, err := b.Body.Hash()
 	if err != nil {
