@@ -130,7 +130,7 @@ func (t *InternalTransaction) Sign(privKey *ecdsa.PrivateKey) error {
 	return err
 }
 
-// Verify ...
+// Verify the transaction's signature.
 func (t *InternalTransaction) Verify() (bool, error) {
 	pubBytes := t.Body.Peer.PubKeyBytes()
 	pubKey := keys.ToPublicKey(pubBytes)
@@ -148,15 +148,15 @@ func (t *InternalTransaction) Verify() (bool, error) {
 	return keys.Verify(pubKey, signBytes, r, s), nil
 }
 
-//HashString returns a string representation of the body's hash. It is used in
-//node/core as a key in a map to keep track of InternalTransactions as they are
-//being processed asynchronously by the consensus and application.
+// HashString returns a string representation of the body's hash. It is used in
+// node/core as a key in a map to keep track of InternalTransactions as they go
+// through consensus.
 func (t *InternalTransaction) HashString() string {
 	hash, _ := t.Body.Hash()
 	return string(hash)
 }
 
-//AsAccepted returns a receipt to accept an InternalTransaction
+// AsAccepted returns a receipt to accept an InternalTransaction.
 func (t *InternalTransaction) AsAccepted() InternalTransactionReceipt {
 	return InternalTransactionReceipt{
 		InternalTransaction: *t,
@@ -164,7 +164,7 @@ func (t *InternalTransaction) AsAccepted() InternalTransactionReceipt {
 	}
 }
 
-//AsRefused return a receipt to refuse an InternalTransaction
+// AsRefused return a receipt to refuse an InternalTransaction.
 func (t *InternalTransaction) AsRefused() InternalTransactionReceipt {
 	return InternalTransactionReceipt{
 		InternalTransaction: *t,
@@ -176,8 +176,8 @@ func (t *InternalTransaction) AsRefused() InternalTransactionReceipt {
 InternalTransactionReceipt
 *******************************************************************************/
 
-//InternalTransactionReceipt records the decision by the application to accept
-//or refuse and InternalTransaction
+// InternalTransactionReceipt records the decision by the application to accept
+// or refuse an InternalTransaction.
 type InternalTransactionReceipt struct {
 	InternalTransaction InternalTransaction
 	Accepted            bool
