@@ -143,5 +143,12 @@ func TestNewBlockFromFrame(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if block.Index() != 10 {
+		t.Fatalf("block index should be %d, not %d", 0, block.Index())
+	}
+
+	if block.RoundReceived() != frame.Round {
+		t.Fatalf("block round received should be %d, not %d", frame.Round, block.RoundReceived())
+	}
 
 }
