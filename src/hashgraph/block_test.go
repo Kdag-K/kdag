@@ -78,5 +78,70 @@ func TestAppendSignature(t *testing.T) {
 	if !res {
 		t.Fatal("Verify returned false")
 	}
+}
+
+func TestNewBlockFromFrame(t *testing.T) {
+
+	frameTimestamp := int64(123456789)
+
+	transactions := [][]byte{
+		[]byte("transaction1"),
+		[]byte("transaction2"),
+		[]byte("transaction3"),
+		[]byte("transaction4"),
+		[]byte("transaction5"),
+		[]byte("transaction6"),
+		[]byte("transaction7"),
+		[]byte("transaction8"),
+		[]byte("transaction9"),
+	}
+
+	internalTransactions := []InternalTransaction{
+		NewInternalTransaction(PEER_ADD, *peers.NewPeer("peer1000.pub", "peer1000.addr", "peer1000")),
+		NewInternalTransaction(PEER_ADD, *peers.NewPeer("peer1001.pub", "peer1001.addr", "peer1001")),
+		NewInternalTransaction(PEER_ADD, *peers.NewPeer("peer1002.pub", "peer1002.addr", "peer1002")),
+	}
+
+	frame := &Frame{
+		Round: 56,
+		Peers: []*peers.Peer{
+			peers.NewPeer("peer1.pub", "peer1.addr", "peer1"),
+			peers.NewPeer("peer2.pub", "peer2.addr", "peer2"),
+			peers.NewPeer("peer3.pub", "peer3.addr", "peer3"),
+		},
+		Roots: nil,
+		Events: []*FrameEvent{
+			{
+				Core: &Event{
+					Body: EventBody{
+						Transactions:         transactions[0:3],
+						InternalTransactions: internalTransactions[:1],
+					},
+				},
+			},
+			{
+				Core: &Event{
+					Body: EventBody{
+						Transactions:         transactions[3:6],
+						InternalTransactions: internalTransactions[1:2],
+					},
+				},
+			},
+			{
+				Core: &Event{
+					Body: EventBody{
+						Transactions:         transactions[6:],
+						InternalTransactions: internalTransactions[2:],
+					},
+				},
+			},
+		},
+		Timestamp: frameTimestamp,
+	}
+
+	block, err := NewBlockFromFrame(10, frame)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 }
