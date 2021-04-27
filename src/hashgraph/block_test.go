@@ -150,9 +150,6 @@ func TestNewBlockFromFrame(t *testing.T) {
 	if block.RoundReceived() != frame.Round {
 		t.Fatalf("block round received should be %d, not %d", frame.Round, block.RoundReceived())
 	}
-	if block.RoundReceived() != frame.Round {
-		t.Fatalf("block round received should be %d, not %d", frame.Round, block.RoundReceived())
-	}
 
 	frameHash, _ := frame.Hash()
 	if !reflect.DeepEqual(block.FrameHash(), frameHash) {
@@ -163,4 +160,11 @@ func TestNewBlockFromFrame(t *testing.T) {
 		t.Fatal("block has wrong transactions")
 	}
 
+	if !reflect.DeepEqual(block.InternalTransactions(), internalTransactions) {
+		t.Fatal("block has wrong internal transactions")
+	}
+
+	if block.Timestamp() != frameTimestamp {
+		t.Fatalf("block timestamp should be %d, not %d", frameTimestamp, block.Timestamp())
+	}
 }
