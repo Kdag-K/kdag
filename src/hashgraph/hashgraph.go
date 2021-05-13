@@ -502,15 +502,15 @@ func (h *Hashgraph) updateAncestorFirstDescendant(event *Event) error {
 				if err := h.Store.SetEvent(a); err != nil {
 					return err
 				}
+				// Stopping condition. We don't want to go all the way down to
+				// the bottom of the hashgraph (which could happen if the event
+				// is from a new participant). So we stop at the ancestors that
+				// are witnesses.
+				if w, err := h.witness(ah); err == nil && w {
+					break
+				}
 				ah = a.SelfParent()
 			} else {
-				break
-			}
-
-			// Stopping condition. When the event is from a new participant, we
-			// don't want to go all the way down to the bottom of the hashgraph.
-			// So we stop at the ancestors that are witnesses.
-			if w, err := h.witness(ah); err != nil && w {
 				break
 			}
 		}
@@ -749,17 +749,17 @@ func (h *Hashgraph) InsertEvent(event *Event, setWireInfo bool) error {
 	return nil
 }
 
-//InsertFrameEvent inserts the FrameEvent's core Event, without checking its
-//parents or signature. It doesnt add the Event to UndeterminedEvents either.
+// InsertFrameEvent inserts the FrameEvent's core Event, without checking its
+// parents or signature. It doesnt add the Event to UndeterminedEvents either.
 func (h *Hashgraph) InsertFrameEvent(frameEvent *FrameEvent) error {
 	event := frameEvent.Core
 
-	//Set caches so round, witness, and timestamp won't be recalculated
+	// Set caches so round, witness, and timestamp won't be recalculated
 	h.roundCache.Add(event.Hex(), frameEvent.Round)
 	h.witnessCache.Add(event.Hex(), frameEvent.Witness)
 	h.timestampCache.Add(event.Hex(), frameEvent.LamportTimestamp)
 
-	//Set the event's private fields for later use
+	// Set the event's private fields for later use
 	event.SetRound(frameEvent.Round)
 	event.SetLamportTimestamp(frameEvent.LamportTimestamp)
 
@@ -1267,12 +1267,23 @@ func (h *Hashgraph) GetFrame(roundReceived int) (*Frame, error) {
 		return nil, err
 	}
 
+	// Compute BFT Timestamp
+	timestamps := []int64{}
+	for _, fw := range round.FamousWitnesses() {
+		ev, err := h.Store.GetEvent(fw)
+		if err != nil {
+			return nil, err
+		}
+		timestamps = append(timestamps, ev.Timestamp())
+	}
+	frameTimestamp := common.Median(timestamps)
 	res := &Frame{
-		Round:    roundReceived,
-		Peers:    peerSet.Peers,
-		Roots:    roots,
-		Events:   events,
-		PeerSets: allPeerSets,
+		Round:     roundReceived,
+		Peers:     peerSet.Peers,
+		Roots:     roots,
+		Events:    events,
+		PeerSets:  allPeerSets,
+		Timestamp: frameTimestamp,
 	}
 
 	if err := h.Store.SetFrame(res); err != nil {
@@ -1282,11 +1293,10 @@ func (h *Hashgraph) GetFrame(roundReceived int) (*Frame, error) {
 	return res, nil
 }
 
-/*
-ProcessSigPool runs through the SignaturePool and tries to map a Signature to
-a known Block. If a Signature is valid, it is appended to the block and removed
-from the SignaturePool. The function also updates the AnchorBlock if necessary.
-*/
+// ProcessSigPool runs through the SignaturePool and tries to map a Signature to
+// a known Block. If a Signature is valid, it is appended to the block and
+// removed from the SignaturePool. The function also updates the AnchorBlock if
+// necessary.
 func (h *Hashgraph) ProcessSigPool() error {
 	h.logger.WithField("pending_signatures", h.PendingSignatures.Len()).Debug("ProcessSigPool()")
 
