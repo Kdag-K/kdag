@@ -1531,14 +1531,14 @@ func (h *Hashgraph) Bootstrap() error {
 
 //ReadWireInfo converts a WireEvent to an Event by replacing int IDs with the
 //corresponding public keys.
-func (h *Hashgraph) ReadWireInfo(wevent WireEvent) (*Event, error) {
+func (h *Hashgraph) ReadWireInfo(we WireEvent) (*Event, error) {
 	selfParent := ""
 	otherParent := ""
 	var err error
 
-	creator, ok := h.Store.RepertoireByID()[wevent.Body.CreatorID]
+	creator, ok := h.Store.RepertoireByID()[we.Body.CreatorID]
 	if !ok {
-		return nil, fmt.Errorf("Creator %d not found", wevent.Body.CreatorID)
+		return nil, fmt.Errorf("Creator %d not found", we.Body.CreatorID)
 	}
 
 	creatorBytes, err := common.DecodeFromString(creator.PubKeyString())
@@ -1546,42 +1546,42 @@ func (h *Hashgraph) ReadWireInfo(wevent WireEvent) (*Event, error) {
 		return nil, err
 	}
 
-	if wevent.Body.SelfParentIndex >= 0 {
-		selfParent, err = h.Store.ParticipantEvent(creator.PubKeyString(), wevent.Body.SelfParentIndex)
+	if we.Body.SelfParentIndex >= 0 {
+		selfParent, err = h.Store.ParticipantEvent(creator.PubKeyString(), we.Body.SelfParentIndex)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if wevent.Body.OtherParentIndex >= 0 {
-		otherParentCreator, ok := h.Store.RepertoireByID()[wevent.Body.OtherParentCreatorID]
+	if we.Body.OtherParentIndex >= 0 {
+		otherParentCreator, ok := h.Store.RepertoireByID()[we.Body.OtherParentCreatorID]
 		if !ok {
-			return nil, fmt.Errorf("Participant %d not found", wevent.Body.OtherParentCreatorID)
+			return nil, fmt.Errorf("Participant %d not found", we.Body.OtherParentCreatorID)
 		}
 
-		otherParent, err = h.Store.ParticipantEvent(otherParentCreator.PubKeyString(), wevent.Body.OtherParentIndex)
+		otherParent, err = h.Store.ParticipantEvent(otherParentCreator.PubKeyString(), we.Body.OtherParentIndex)
 		if err != nil {
-			return nil, fmt.Errorf("OtherParent (creator: %d, index: %d) not found", wevent.Body.OtherParentCreatorID, wevent.Body.OtherParentIndex)
+			return nil, fmt.Errorf("OtherParent (creator: %d, index: %d) not found", we.Body.OtherParentCreatorID, we.Body.OtherParentIndex)
 		}
 	}
 
 	body := EventBody{
-		Transactions:         wevent.Body.Transactions,
-		InternalTransactions: wevent.Body.InternalTransactions,
-		BlockSignatures:      wevent.BlockSignatures(creatorBytes),
+		Transactions:         we.Body.Transactions,
+		InternalTransactions: we.Body.InternalTransactions,
+		BlockSignatures:      we.BlockSignatures(creatorBytes),
 		Parents:              []string{selfParent, otherParent},
 		Creator:              creatorBytes,
-		Index:                wevent.Body.Index,
+		Index:                we.Body.Index,
 
-		selfParentIndex:      wevent.Body.SelfParentIndex,
-		otherParentCreatorID: wevent.Body.OtherParentCreatorID,
-		otherParentIndex:     wevent.Body.OtherParentIndex,
-		creatorID:            wevent.Body.CreatorID,
+		selfParentIndex:      we.Body.SelfParentIndex,
+		otherParentCreatorID: we.Body.OtherParentCreatorID,
+		otherParentIndex:     we.Body.OtherParentIndex,
+		creatorID:            we.Body.CreatorID,
 	}
 
 	event := &Event{
 		Body:      body,
-		Signature: wevent.Signature,
+		Signature: we.Signature,
 	}
 
 	return event, nil
