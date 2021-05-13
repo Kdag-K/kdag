@@ -28,18 +28,18 @@ func TestLRU(t *testing.T) {
 			t.Fatalf("bad key: %v", k)
 		}
 	}
-	//for i := 0; i < 128; i++ {
-	//	_, ok := l.Get(i)
-	//	if ok {
-	//		t.Fatalf("should be evicted")
-	//	}
-	//}
-	//for i := 128; i < 256; i++ {
-	//	_, ok := l.Get(i)
-	//	if !ok {
-	//		t.Fatalf("should not be evicted")
-	//	}
-	//}
+	for i := 0; i < 128; i++ {
+		_, ok := l.Get(i)
+		if ok {
+			t.Fatalf("should be evicted")
+		}
+	}
+	for i := 128; i < 256; i++ {
+		_, ok := l.Get(i)
+		if !ok {
+			t.Fatalf("should not be evicted")
+		}
+	}
 	for i := 128; i < 192; i++ {
 		ok := l.Remove(i)
 		if !ok {
@@ -146,8 +146,8 @@ func TestLRU_Peek(t *testing.T) {
 		t.Errorf("1 should be set to 1: %v, %v", v, ok)
 	}
 
-	//l.Add(3, 3)
-	//if l.Contains(1) {
-	//	t.Errorf("should not have updated recent-ness of 1")
-	//}
+	l.Add(3, 3)
+	if l.Contains(1) {
+		t.Errorf("should not have updated recent-ness of 1")
+	}
 }
