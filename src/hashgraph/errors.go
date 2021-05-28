@@ -1,7 +1,5 @@
 package hashgraph
 
-import "fmt"
-
 // SelfParentError is used to differentiate errors that are normal when the
 // hashgraph is being used corrently by multiple go-routines, from errors that
 // should not be occuring event in a concurrent context.
@@ -31,8 +29,4 @@ func (e SelfParentError) Error() string {
 func IsNormalSelfParentError(err error) bool {
 	spErr, ok := err.(SelfParentError)
 	return ok && spErr.normal
-}
-
-func errorID(codespace string, code uint32) string {
-	return fmt.Sprintf("%s:%d", codespace, code)
 }
