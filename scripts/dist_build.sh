@@ -28,9 +28,9 @@ echo "==> Building..."
 		-arch="${XC_ARCH}" \
 		-osarch="!darwin/arm !solaris/amd64 !freebsd/amd64" \
 		-ldflags "-X ${GIT_IMPORT}.GitCommit='${GIT_COMMIT}' -X ${GIT_IMPORT}.GitDescribe='${GIT_DESCRIBE}'" \
-		-output "build/pkg/{{.OS}}_{{.Arch}}/babble" \
+		-output "build/pkg/{{.OS}}_{{.Arch}}/kdag" \
 		-tags="${BUILD_TAGS}" \
-		github.com/Kdag-K/kdag/cmd/babble
+		github.com/Kdag-K/kdag/cmd/kdag
 
 # Zip all the files.
 echo "==> Packaging..."
