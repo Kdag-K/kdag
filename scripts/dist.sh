@@ -33,7 +33,7 @@ docker run --rm  \
     -w /go/src/github.com/Kdag-K/kdag \
      ./scripts/dist_build.sh
 
-# Add "babble" and $VERSION prefix to package name.
+# Add "kdag" and $VERSION prefix to package name.
 rm -rf ./build/dist
 mkdir -p ./build/dist
 for FILENAME in $(find ./build/pkg -mindepth 1 -maxdepth 1 -type f); do
