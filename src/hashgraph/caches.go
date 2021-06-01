@@ -37,7 +37,8 @@ type ParticipantEventsCache struct {
 	rim          *cm.RollingIndexMap
 }
 
-// NewParticipantEventsCache ...
+// NewParticipantEventsCache instantiates a new ParticipantEventsCache. The size
+// parameter controls the size of each RollingIndex within the cache.
 func NewParticipantEventsCache(size int) *ParticipantEventsCache {
 	return &ParticipantEventsCache{
 		participants: peers.NewPeerSet([]*peers.Peer{}),
@@ -45,13 +46,14 @@ func NewParticipantEventsCache(size int) *ParticipantEventsCache {
 	}
 }
 
-// AddPeer ...
+// AddPeer adds a peer to the cache.
 func (pec *ParticipantEventsCache) AddPeer(peer *peers.Peer) error {
 	pec.participants = pec.participants.WithNewPeer(peer)
 	return pec.rim.AddKey(peer.ID())
 }
 
-//particant is the CASE-INSENSITIVE string hex representation of the public key.
+// particant is the CASE-INSENSITIVE string hex representation of the public
+// key.
 func (pec *ParticipantEventsCache) participantID(participant string) (uint32, error) {
 	pUpper := strings.ToUpper(participant)
 	peer, ok := pec.participants.ByPubKey[pUpper]
@@ -62,7 +64,7 @@ func (pec *ParticipantEventsCache) participantID(participant string) (uint32, er
 	return peer.ID(), nil
 }
 
-//Get returns participant events with index > skip
+// Get returns a participant's events with index > skip
 func (pec *ParticipantEventsCache) Get(participant string, skipIndex int) ([]string, error) {
 	id, err := pec.participantID(participant)
 	if err != nil {
@@ -109,7 +111,7 @@ func (pec *ParticipantEventsCache) GetLast(participant string) (string, error) {
 	return last.(string), nil
 }
 
-// Set ...
+// Set attemps to set an event to a participant's events.
 func (pec *ParticipantEventsCache) Set(participant string, hash string, index int) error {
 	id, err := pec.participantID(participant)
 	if err != nil {
@@ -123,7 +125,7 @@ func (pec *ParticipantEventsCache) Known() map[uint32]int {
 	return pec.rim.Known()
 }
 
-// PeerSetCache ...
+// PeerSetCache is a cache that keeps track of peer-sets.
 type PeerSetCache struct {
 	rounds             sort.IntSlice
 	peerSets           map[int]*peers.PeerSet
@@ -132,7 +134,7 @@ type PeerSetCache struct {
 	firstRounds        map[uint32]int
 }
 
-// NewPeerSetCache ...
+// NewPeerSetCache creates a new PeerSetCache.
 func NewPeerSetCache() *PeerSetCache {
 	return &PeerSetCache{
 		rounds:             sort.IntSlice{},
@@ -143,7 +145,7 @@ func NewPeerSetCache() *PeerSetCache {
 	}
 }
 
-// Set ...
+// Set adds a peer-set at a given round and updates internal information.
 func (c *PeerSetCache) Set(round int, peerSet *peers.PeerSet) error {
 	if _, ok := c.peerSets[round]; ok {
 		return cm.NewStoreErr("PeerSetCache", cm.KeyAlreadyExists, strconv.Itoa(round))
