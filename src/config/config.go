@@ -274,7 +274,7 @@ func (c *Config) ICEServers() []webrtc.ICEServer {
 	}
 }
 
-// Logger returns a formatted logrus Entry, with prefix set to "babble".
+// Logger returns a formatted logrus Entry, with prefix set to "kdag".
 func (c *Config) Logger() *logrus.Entry {
 	if c.logger == nil {
 		c.logger = logrus.New()
