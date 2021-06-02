@@ -168,7 +168,7 @@ func (c *PeerSetCache) Set(round int, peerSet *peers.PeerSet) error {
 	return nil
 }
 
-// Get ...
+// Get returns the peer-set corresponding to a given round.
 func (c *PeerSetCache) Get(round int) (*peers.PeerSet, error) {
 	//check if directly in peerSets
 	ps, ok := c.peerSets[round]
@@ -195,7 +195,7 @@ func (c *PeerSetCache) Get(round int) (*peers.PeerSet, error) {
 	return c.peerSets[c.rounds[len(c.rounds)-1]], nil
 }
 
-// GetAll ...
+// GetAll returns all peer-sets in a map of round to peer-set.
 func (c *PeerSetCache) GetAll() (map[int][]*peers.Peer, error) {
 	res := make(map[int][]*peers.Peer)
 	for _, r := range c.rounds {
@@ -204,17 +204,18 @@ func (c *PeerSetCache) GetAll() (map[int][]*peers.Peer, error) {
 	return res, nil
 }
 
-// RepertoireByID ...
+// RepertoireByID returns all the known peers indexed by ID. This includes peers
+// that are no longer in the active peer-set.
 func (c *PeerSetCache) RepertoireByID() map[uint32]*peers.Peer {
 	return c.repertoireByID
 }
 
-// RepertoireByPubKey ...
+// RepertoireByPubKey returns all the known peers indexed by public key.
 func (c *PeerSetCache) RepertoireByPubKey() map[string]*peers.Peer {
 	return c.repertoireByPubKey
 }
 
-// FirstRound ...
+// FirstRound returns the index of the first round where a peer appeared.
 func (c *PeerSetCache) FirstRound(id uint32) (int, bool) {
 	fr, ok := c.firstRounds[id]
 	if ok {
@@ -223,7 +224,7 @@ func (c *PeerSetCache) FirstRound(id uint32) (int, bool) {
 	return math.MaxInt32, false
 }
 
-// PendingRound ...
+// PendingRound represents a round as it goes through consensus.
 type PendingRound struct {
 	Index   int
 	Decided bool
