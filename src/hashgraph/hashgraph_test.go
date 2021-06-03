@@ -1609,6 +1609,20 @@ func TestGetFrame(t *testing.T) {
 			t.Fatal("Frame.Events is not good")
 		}
 
+		timestamps := []int64{}
+		for _, fw := range []string{"f0", "f1", "f2"} {
+			e, err := h.Store.GetEvent(index[fw])
+			if err != nil {
+				t.Fatal(err)
+			}
+			timestamps = append(timestamps, e.Timestamp())
+		}
+		expectedTimestamp := common.Median(timestamps)
+
+		if !reflect.DeepEqual(expectedTimestamp, frame.Timestamp) {
+			t.Fatal("Frame.Timestamp is not good")
+		}
+
 		block0, err := h.Store.GetBlock(0)
 		if err != nil {
 			t.Fatalf("Store should contain a block with Index 1: %v", err)
