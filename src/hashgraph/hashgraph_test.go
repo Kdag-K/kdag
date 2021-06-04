@@ -1694,6 +1694,20 @@ func TestGetFrame(t *testing.T) {
 		if !reflect.DeepEqual(expectedEvents, frame.Events) {
 			t.Fatal("Frame.Events is not good")
 		}
+
+		timestamps := []int64{}
+		for _, fw := range []string{"g0", "g1", "g2"} {
+			e, err := h.Store.GetEvent(index[fw])
+			if err != nil {
+				t.Fatal(err)
+			}
+			timestamps = append(timestamps, e.Timestamp())
+		}
+		expectedTimestamp := common.Median(timestamps)
+
+		if !reflect.DeepEqual(expectedTimestamp, frame.Timestamp) {
+			t.Fatal("Frame.Timestamp is not good")
+		}
 	})
 
 }
