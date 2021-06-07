@@ -230,7 +230,7 @@ type PendingRound struct {
 	Decided bool
 }
 
-// OrderedPendingRounds ...
+// OrderedPendingRounds is an ordered list of PendingRounds.
 type OrderedPendingRounds []*PendingRound
 
 // Len returns the length
@@ -244,13 +244,13 @@ func (a OrderedPendingRounds) Less(i, j int) bool {
 	return a[i].Index < a[j].Index
 }
 
-// PendingRoundsCache ...
+// PendingRoundsCache is a cache for PendingRounds.
 type PendingRoundsCache struct {
 	items       map[int]*PendingRound
 	sortedItems OrderedPendingRounds
 }
 
-// NewPendingRoundsCache ...
+// NewPendingRoundsCache creates a new PendingRoundsCache.
 func NewPendingRoundsCache() *PendingRoundsCache {
 	return &PendingRoundsCache{
 		items:       make(map[int]*PendingRound),
@@ -258,25 +258,26 @@ func NewPendingRoundsCache() *PendingRoundsCache {
 	}
 }
 
-// Queued ...
+// Queued indicates whether a round is already part of the PendingRoundsCache.
 func (c *PendingRoundsCache) Queued(round int) bool {
 	_, ok := c.items[round]
 	return ok
 }
 
-// Set ...
+// Set adds an item to the PendingRoundCache and preserves the order.
 func (c *PendingRoundsCache) Set(pendingRound *PendingRound) {
 	c.items[pendingRound.Index] = pendingRound
 	c.sortedItems = append(c.sortedItems, pendingRound)
 	sort.Sort(c.sortedItems)
 }
 
-// GetOrderedPendingRounds ...
+// GetOrderedPendingRounds returns the ordered list of PendingRounds.
 func (c *PendingRoundsCache) GetOrderedPendingRounds() OrderedPendingRounds {
 	return c.sortedItems
 }
 
-// Update ...
+// Update takes a list of indexes of rounds that have been decided and updates
+// the PendingRoundsCache accordingly.
 func (c *PendingRoundsCache) Update(decidedRounds []int) {
 	for _, drn := range decidedRounds {
 		if dr, ok := c.items[drn]; ok {
