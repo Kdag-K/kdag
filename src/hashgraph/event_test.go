@@ -162,7 +162,7 @@ func TestIsLoaded(t *testing.T) {
 	}
 
 	//non-empty tx payload
-	event.Body.Transactions = [][]byte{[]byte("abc")}
+	event.Body.Transactions = [][]byte{[]byte("invalid test validator")}
 	if !event.IsLoaded() {
 		t.Fatalf("IsLoaded() should return true for non-empty transaction payload")
 	}
