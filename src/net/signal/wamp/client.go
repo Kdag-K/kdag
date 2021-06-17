@@ -11,10 +11,10 @@ import (
 	"io/ioutil"
 	"os"
 	"time"
-	
-	"github.com/Kdag-K/kdag/src/net/signal"
+
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/Kdag-K/kdag/src/net/signal"
 	"github.com/pion/webrtc/v2"
 	"github.com/sirupsen/logrus"
 )
@@ -102,10 +102,16 @@ func NewClient(
 	}
 
 	res := &Client{
-		pubKey:   pubKey,
-		client:   cli,
-		consumer: make(chan signal.OfferPromise),
-		logger:   logger,
+		pubKey:    pubKey,
+		routerURL: fmt.Sprintf("wss://%s", server),
+		config:    cfg,
+		consumer:  make(chan signal.OfferPromise),
+		logger:    logger,
+	}
+
+	err := res.Connect()
+	if err != nil {
+		return nil, err
 	}
 
 	return res, nil
@@ -143,7 +149,14 @@ func (c *Client) Offer(target string, offer webrtc.SessionDescription) (*webrtc.
 		string(raw),
 	}
 
-	result, err := c.client.Call(context.Background(), target, nil, callArgs, nil, nil)
+	// Create a context to cancel the call after timeout.
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		c.config.ResponseTimeout,
+	)
+	defer cancel()
+
+	result, err := c.client.Call(ctx, target, nil, callArgs, nil, nil)
 	if err != nil {
 		c.logger.Error(err)
 		return nil, err
