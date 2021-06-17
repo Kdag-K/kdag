@@ -20,4 +20,5 @@ require (
 	github.com/spf13/viper v1.8.0
 	github.com/ugorji/go/codec v1.1.7
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
+	github.com/stretchr/testify v1.7.0
 )
