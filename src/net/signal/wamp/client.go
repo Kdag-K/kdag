@@ -92,15 +92,6 @@ func NewClient(
 
 	cfg.TlsCfg = tlscfg
 
-	cli, err := client.ConnectNet(
-		context.Background(),
-		fmt.Sprintf("wss://%s", server),
-		cfg,
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	res := &Client{
 		pubKey:    pubKey,
 		routerURL: fmt.Sprintf("wss://%s", server),
@@ -115,6 +106,28 @@ func NewClient(
 	}
 
 	return res, nil
+}
+
+// Connect creates a new WAMP client connected to a WAMP router specified by the
+// client's routerURL. If a WAMP client already exists and is already connected,
+// it does nothing.
+func (c *Client) Connect() error {
+	if c.client != nil && c.client.Connected() {
+		return nil
+	}
+
+	cli, err := client.ConnectNet(
+		context.Background(),
+		c.routerURL,
+		c.config,
+	)
+	if err != nil {
+		return err
+	}
+
+	c.client = cli
+
+	return nil
 }
 
 // ID implements the Signal interface. It returns the pubKey indentifying this
