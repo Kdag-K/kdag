@@ -191,7 +191,7 @@ func (c *Client) Close() error {
 	return c.client.Close()
 }
 
-// TODO formalise RPC arguments and errors
+// callHandler is called when an offer is received from the signaling server.
 func (c *Client) callHandler(ctx context.Context, inv *wamp.Invocation) client.InvokeResult {
 	if len(inv.Arguments) != 2 {
 		return errResult(
@@ -225,8 +225,10 @@ func (c *Client) callHandler(ctx context.Context, inv *wamp.Invocation) client.I
 	c.consumer <- promise
 
 	// Wait for response
-	// TODO Timeout?
+	timer := time.NewTimer(c.config.ResponseTimeout)
 	select {
+	case <-timer.C:
+		return errResult("Callee TIMEOUT")
 	case resp := <-respCh:
 		if resp.Error != nil {
 			return errResult(resp.Error.Error())
