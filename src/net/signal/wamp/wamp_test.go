@@ -6,16 +6,19 @@ import (
 	"time"
 
 	"github.com/Kdag-K/kdag/src/common"
+	"github.com/Kdag-K/kdag/src/config"
 	"github.com/pion/webrtc/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/require"
 )
 
 const certFile = "test_data/cert.pem"
 const keyFile = "test_data/key.pem"
+const signalTimeout = 5 * time.Second
 
 func TestWampSelfSigned(t *testing.T) {
 	url := "localhost:2443"
-	realm := "office"
+	realm := config.DefaultSignalRealm
 	certFile := "test_data/cert.pem"
 	keyFile := "test_data/key.pem"
 
@@ -24,10 +27,8 @@ func TestWampSelfSigned(t *testing.T) {
 		certFile,
 		keyFile,
 		common.NewTestLogger(t, logrus.DebugLevel).WithField("component", "signal-server"))
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	
+	require.NoError(t, err)
 
 	go server.Run()
 	defer server.Shutdown()
@@ -40,17 +41,15 @@ func TestWampSelfSigned(t *testing.T) {
 		"callee",
 		certFile,
 		false,
+		signalTimeout,
 		common.NewTestLogger(t, logrus.DebugLevel).WithField("component", "signal-client callee"))
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	
+	require.NoError(t, err)
 
 	defer callee.Close()
 
-	if err := callee.Listen(); err != nil {
-		t.Fatal(err)
-	}
+	err := callee.Listen()
+	require.NoError(t, err)
 
 	caller, err := NewClient(
 		url,
@@ -58,11 +57,10 @@ func TestWampSelfSigned(t *testing.T) {
 		"caller",
 		certFile,
 		false,
+		signalTimeout,
 		common.NewTestLogger(t, logrus.DebugLevel).WithField("component", "signal-client caller"))
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	
+	require.NoError(t, err)
 
 	defer caller.Close()
 
@@ -71,6 +69,7 @@ func TestWampSelfSigned(t *testing.T) {
 	// test that the RPC call is relayed and that the handler on the receiving
 	// end is called
 	_, err = caller.Offer("callee", webrtc.SessionDescription{})
+	require.NoError(t, err)
 	if err == nil || !strings.Contains(err.Error(), ErrProcessingOffer) {
 		t.Fatal("Should have receveived an ErrProcessingOffer")
 
