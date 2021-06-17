@@ -10,7 +10,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
+	"time"
+	
 	"github.com/Kdag-K/kdag/src/net/signal"
 	"github.com/gammazero/nexus/v3/client"
 	"github.com/gammazero/nexus/v3/wamp"
@@ -21,24 +22,30 @@ import (
 // Client implements the Signal interface. It sends and receives SDP offers
 // through a WAMP server using WebSockets.
 type Client struct {
-	pubKey   string
-	client   *client.Client
-	consumer chan signal.OfferPromise
-	logger   *logrus.Entry
+	pubKey    string
+	routerURL string
+	config    client.Config
+	client    *client.Client
+	consumer  chan signal.OfferPromise
+	logger    *logrus.Entry
 }
 
 // NewClient instantiates a new Client, and opens a connection to the WAMP
 // signaling server.
-func NewClient(server string,
+func NewClient(
+	server string,
 	realm string,
 	pubKey string,
 	caFile string,
 	insecureSkipVerify bool,
-	logger *logrus.Entry) (*Client, error) {
+	responseTimeout time.Duration,
+	logger *logrus.Entry,
+) (*Client, error) {
 
 	cfg := client.Config{
-		Realm:  realm,
-		Logger: logger,
+		Realm:           realm,
+		ResponseTimeout: responseTimeout,
+		Logger:          logger,
 	}
 
 	tlscfg := &tls.Config{}
