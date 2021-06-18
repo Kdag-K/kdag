@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 	"time"
-
+	
 	"github.com/Kdag-K/kdag/src/net/signal"
 	"github.com/pion/datachannel"
 	webrtc "github.com/pion/webrtc/v2"
@@ -31,10 +31,7 @@ type webRTCStreamLayer struct {
 
 // newwebRTCStreamLayer instantiates a new webRTCStreamLayer and fires up the
 // background connection aggregator (signaling process)
-func newWebRTCStreamLayer(signal signal.Signal,
-	iceServers []webrtc.ICEServer,
-	logger *logrus.Entry) *webRTCStreamLayer {
-
+func newWebRTCStreamLayer(signal signal.Signal, iceServers []webrtc.ICEServer, logger *logrus.Entry) *webRTCStreamLayer {
 	stream := &webRTCStreamLayer{
 		peerConnections:        make(map[string]*webrtc.PeerConnection),
 		dataChannels:           make(map[uint16]datachannel.ReadWriteCloser),
@@ -43,7 +40,7 @@ func newWebRTCStreamLayer(signal signal.Signal,
 		incomingConnAggregator: make(chan net.Conn),
 		logger:                 logger,
 	}
-	return stream
+	return stream //nolint:wsl
 }
 
 // Receive SDP offers from Signal, create corresponding PeerConnections and
