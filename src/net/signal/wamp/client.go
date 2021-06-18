@@ -156,7 +156,6 @@ func (c *Client) Offer(target string, offer webrtc.SessionDescription) (*webrtc.
 		return nil, err
 	}
 
-	// TODO formalise RPC args
 	callArgs := wamp.List{
 		string(c.pubKey),
 		string(raw),
@@ -175,7 +174,6 @@ func (c *Client) Offer(target string, offer webrtc.SessionDescription) (*webrtc.
 		return nil, err
 	}
 
-	// TODO formalise RPC args
 	sdp, ok := wamp.AsString(result.Arguments[0])
 	if !ok {
 		return nil, err
