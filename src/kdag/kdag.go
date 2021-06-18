@@ -1,12 +1,11 @@
 package kdag
 
 import (
-	"fmt"
 	"os"
-	"time"
-
+	_ "time"
+	
 	"github.com/sirupsen/logrus"
-
+	
 	"github.com/Kdag-K/kdag/src/config"
 	"github.com/Kdag-K/kdag/src/crypto/keys"
 	h "github.com/Kdag-K/kdag/src/hashgraph"
@@ -189,7 +188,7 @@ func (b *Kdag) initTransport() error {
 
 		webRTCTransport, err := net.NewWebRTCTransport(
 			signal,
-			b.Config.ICEServers,
+			b.Config.ICEServers(),
 			b.Config.MaxPool,
 			b.Config.TCPTimeout,
 			b.Config.JoinTimeout,
@@ -344,23 +343,4 @@ func (b *Kdag) initService() error {
 		b.Service = service.NewService(b.Config.ServiceAddr, b.Node, b.Config.Logger())
 	}
 	return nil
-}
-
-// backupFileName implements the naming convention for database backups:
-// badger_db--UTC--<created_at UTC ISO8601>
-func backupFileName(base string) string {
-	ts := time.Now().UTC()
-	return fmt.Sprintf("%s--UTC--%s", base, toISO8601(ts))
-}
-
-func toISO8601(t time.Time) string {
-	var tz string
-	name, offset := t.Zone()
-	if name == "UTC" {
-		tz = "Z"
-	} else {
-		tz = fmt.Sprintf("%03d00", offset/3600)
-	}
-	return fmt.Sprintf("%04d-%02d-%02dT%02d-%02d-%02d.%09d%s",
-		t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), tz)
 }
