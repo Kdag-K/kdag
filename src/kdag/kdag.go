@@ -1,8 +1,9 @@
 package kdag
 
 import (
+	"fmt"
 	"os"
-	_ "time"
+	"time"
 	
 	"github.com/sirupsen/logrus"
 	
