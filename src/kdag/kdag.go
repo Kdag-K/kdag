@@ -344,3 +344,9 @@ func (b *Kdag) initService() error {
 	}
 	return nil
 }
+// backupFileName implements the naming convention for database backups:
+// badger_db--UTC--<created_at UTC ISO8601>
+func backupFileName(base string) string {
+	ts := time.Now().UTC()
+	return fmt.Sprintf("%s--UTC--%s", base, toISO8601(ts))
+}
