@@ -3,12 +3,12 @@ package wamp
 import (
 	"context"
 	"crypto/tls"
-	"fmt"
 	"log"
 	"net/http"
-
+	
 	"github.com/gammazero/nexus/v3/router"
 	"github.com/gammazero/nexus/v3/wamp"
+	"github.com/palantir/stacktrace"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,9 +31,9 @@ func NewServer(address string,
 
 	// Create router instance.
 	routerConfig := &router.Config{
-		RealmConfigs: []*router.RealmConfig{
-			&router.RealmConfig{
-				URI:           wamp.URI(realm),
+		RealmConfigs: []*router.RealmConfig {
+			{
+				URI          : wamp.URI(realm),
 				AnonymousAuth: true,
 			},
 		},
@@ -48,10 +48,10 @@ func NewServer(address string,
 	wss := router.NewWebsocketServer(nxr)
 
 	// prepare tls config with certFile and keyFile
-	tlscfg := &tls.Config{}
+	tlscfg := &tls.Config{} //nolint:gosec
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 	if err != nil {
-		return nil, fmt.Errorf("error loading X509 key pair: %s", err)
+		return nil, stacktrace.NewError("error loading X509 key pair: %s", err)
 	}
 	tlscfg.Certificates = append(tlscfg.Certificates, cert)
 
