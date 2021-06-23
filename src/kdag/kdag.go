@@ -19,7 +19,7 @@ import (
 
 // Kdag is a struct containing the key parts of a kdag node
 type Kdag struct {
-	Config       *config.Config
+	Config        *config.Config
 	Node         *node.Node
 	Transport    net.Transport
 	Store        h.Store

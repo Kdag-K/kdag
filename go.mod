@@ -12,6 +12,7 @@ require (
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
+	github.com/palantir/stacktrace v0.0.0-20161112013806-78658fd2d177
 	github.com/pion/datachannel v1.4.14
 	github.com/pion/webrtc/v2 v2.2.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
@@ -19,6 +20,6 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.8.0
 	github.com/stretchr/testify v1.7.0
-	github.com/ugorji/go/codec v1.1.7
+	github.com/ugorji/go/codec v1.2.6
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 )
