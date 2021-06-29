@@ -99,11 +99,11 @@ func loadConfig(cmd *cobra.Command, args []string) error {
 //Retrieve the default environment configuration.
 func parseConfig() (*CLIConfig, error) {
 	conf := NewDefaultCLIConf()
-	err := viper.Unmarshal(conf)
-	if err != nil {
+	if err := viper.Unmarshal(conf); err != nil {
 		return nil, err
 	}
-	return conf, err
+
+	return conf,nil
 }
 
 func newLogger() *logrus.Logger {
