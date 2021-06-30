@@ -49,6 +49,7 @@ func (c *LRU) Add(key, value interface{}) bool {
 	if ent, ok := c.items[key]; ok {
 		c.evictList.MoveToFront(ent)
 		ent.Value.(*entry).value = value
+		
 		return false
 	}
 
@@ -62,6 +63,7 @@ func (c *LRU) Add(key, value interface{}) bool {
 	if evict {
 		c.removeOldest()
 	}
+	
 	return evict
 }
 
@@ -69,8 +71,10 @@ func (c *LRU) Add(key, value interface{}) bool {
 func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
 	if ent, ok := c.items[key]; ok {
 		c.evictList.MoveToFront(ent)
+		
 		return ent.Value.(*entry).value, true
 	}
+	
 	return
 }
 
@@ -78,6 +82,7 @@ func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
 // or deleting it for being stale.
 func (c *LRU) Contains(key interface{}) (ok bool) {
 	_, ok = c.items[key]
+	
 	return ok
 }
 
@@ -106,8 +111,10 @@ func (c *LRU) RemoveOldest() (interface{}, interface{}, bool) {
 	if ent != nil {
 		c.removeElement(ent)
 		kv := ent.Value.(*entry)
+		
 		return kv.key, kv.value, true
 	}
+	
 	return nil, nil, false
 }
 
@@ -116,8 +123,10 @@ func (c *LRU) GetOldest() (interface{}, interface{}, bool) {
 	ent := c.evictList.Back()
 	if ent != nil {
 		kv := ent.Value.(*entry)
+		
 		return kv.key, kv.value, true
 	}
+	
 	return nil, nil, false
 }
 
