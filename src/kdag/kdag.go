@@ -17,7 +17,7 @@ import (
 	"github.com/Kdag-K/kdag/src/service"
 )
 
-// Kdag is a struct containing the key parts of a kdag node
+// Kdag is a struct containing the key parts of a kdag node.
 type Kdag struct {
 	Config        *config.Config
 	Node         *node.Node
@@ -42,7 +42,6 @@ func NewKdag(c *config.Config) *Kdag {
 
 // Init initialises the kdag engine
 func (b *Kdag) Init() error {
-
 	b.logger.Debug("validateConfig")
 	if err := b.validateConfig(); err != nil {
 		b.logger.WithError(err).Error("kdag.go:Init() validateConfig")
@@ -103,7 +102,7 @@ func (b *Kdag) Run() {
 
 func (b *Kdag) validateConfig() error {
 	// If --datadir was explicitely set, but not --db, the following line will
-	// update the default database dir to be inside the new datadir
+	// update the default database dir to be inside the new datadir.
 	b.Config.SetDataDir(b.Config.DataDir)
 
 	logFields := logrus.Fields{
@@ -305,7 +304,6 @@ func (b *Kdag) initKey() error {
 }
 
 func (b *Kdag) initNode() error {
-
 	validator := node.NewValidator(b.Config.Key, b.Config.Moniker)
 
 	p, ok := b.Peers.ByID[validator.ID()]
@@ -347,7 +345,7 @@ func (b *Kdag) initService() error {
 }
 
 // backupFileName implements the naming convention for database backups:
-// badger_db--UTC--<created_at UTC ISO8601>
+// badger_db--UTC--<created_at UTC ISO8601>.
 func backupFileName(base string) string {
 	ts := time.Now().UTC()
 	return fmt.Sprintf("%s--UTC--%s", base, toISO8601(ts))
