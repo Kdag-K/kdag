@@ -7,9 +7,10 @@ import (
 
 	"github.com/Kdag-K/kdag/src/common"
 	"github.com/Kdag-K/kdag/src/crypto/keys"
+	"github.com/pkg/errors"
 )
 
-// Peer is a struct that holds Peer data
+// Peer is a struct that holds Peer data.
 type Peer struct {
 	NetAddr   string
 	PubKeyHex string
@@ -18,22 +19,24 @@ type Peer struct {
 	id uint32
 }
 
-// NewPeer is a factory method for creating a new Peer instance
+// NewPeer is a factory method for creating a new Peer instance.
 func NewPeer(pubKeyHex, netAddr, moniker string) *Peer {
 	peer := &Peer{
 		PubKeyHex: pubKeyHex,
 		NetAddr:   netAddr,
 		Moniker:   moniker,
 	}
+
 	return peer
 }
 
-// ID returns an ID for the peer, calculating a hash is one is not available
+// ID returns an ID for the peer, calculating a hash is one is not available.
 func (p *Peer) ID() uint32 {
 	if p.id == 0 {
 		pubKeyBytes := p.PubKeyBytes()
 		p.id = keys.PublicKeyID(pubKeyBytes)
 	}
+
 	return p.id
 }
 
@@ -44,9 +47,10 @@ func (p *Peer) PubKeyString() string {
 }
 
 // PubKeyBytes converts hex string representation of the public key and returns
-// a byte array
+// a byte array.
 func (p *Peer) PubKeyBytes() []byte {
 	res, _ := common.DecodeFromString(p.PubKeyHex)
+
 	return res
 }
 
@@ -58,23 +62,20 @@ func (p *Peer) Marshal() ([]byte, error) {
 	enc := json.NewEncoder(&b)
 
 	if err := enc.Encode(p); err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "Encode error.")
 	}
 
 	return b.Bytes(), nil
 }
 
-// Unmarshal generates a JSON representation of the peer
+// Unmarshal generates a JSON representation of the peer.
 func (p *Peer) Unmarshal(data []byte) error {
 	b := bytes.NewBuffer(data)
 
-	dec := json.NewDecoder(b) //will read from b
+	dec := json.NewDecoder(b) // will read from b
+	err := dec.Decode(p)
 
-	if err := dec.Decode(p); err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // ExcludePeer is used to exclude a single peer from a list of peers.
@@ -88,5 +89,6 @@ func ExcludePeer(peers []*Peer, peer uint32) (int, []*Peer) {
 			index = i
 		}
 	}
+
 	return index, otherPeers
 }
