@@ -7,7 +7,10 @@ import (
 	"github.com/Kdag-K/kdag/src/peers"
 )
 
-// InmemStore ...
+// InmemStore implements the Store interface with inmemory caches. When the
+// caches are full, older items are evicted, so InmemStore is not suitable for
+// long running deployments where joining nodes expect to sync from the
+// beginning of a hashgraph.
 type InmemStore struct {
 	cacheSize              int
 	eventCache             *cm.LRU          //hash => Event
@@ -24,7 +27,8 @@ type InmemStore struct {
 	lastBlock              int
 }
 
-// NewInmemStore ...
+// NewInmemStore creates a new InmemStore where all caches are limited by
+// cacheSize items.
 func NewInmemStore(cacheSize int) *InmemStore {
 	store := &InmemStore{
 		cacheSize:              cacheSize,
@@ -43,7 +47,9 @@ func NewInmemStore(cacheSize int) *InmemStore {
 	return store
 }
 
-// CacheSize ...
+// CacheSize returns the size limit that was provided to all the caches that
+// make up the InmemStore. This does not correspond to the total number of items
+// in the store or the total number of items allowed in the store.
 func (s *InmemStore) CacheSize() int {
 	return s.cacheSize
 }
@@ -82,27 +88,27 @@ func (s *InmemStore) addParticipant(p *peers.Peer) error {
 	return nil
 }
 
-// GetAllPeerSets ...
+// GetAllPeerSets implements the Store interface.
 func (s *InmemStore) GetAllPeerSets() (map[int][]*peers.Peer, error) {
 	return s.peerSetCache.GetAll()
 }
 
-// FirstRound ...
+// FirstRound implements the Store interface.
 func (s *InmemStore) FirstRound(id uint32) (int, bool) {
 	return s.peerSetCache.FirstRound(id)
 }
 
-// RepertoireByPubKey ...
+// RepertoireByPubKey implements the Store interface.
 func (s *InmemStore) RepertoireByPubKey() map[string]*peers.Peer {
 	return s.peerSetCache.RepertoireByPubKey()
 }
 
-// RepertoireByID ...
+// RepertoireByID implements the Store interface.
 func (s *InmemStore) RepertoireByID() map[uint32]*peers.Peer {
 	return s.peerSetCache.RepertoireByID()
 }
 
-// GetEvent ...
+// GetEvent implements the Store interface.
 func (s *InmemStore) GetEvent(key string) (*Event, error) {
 	res, ok := s.eventCache.Get(key)
 	if !ok {
@@ -112,7 +118,7 @@ func (s *InmemStore) GetEvent(key string) (*Event, error) {
 	return res.(*Event), nil
 }
 
-// SetEvent ...
+// SetEvent implements the Store interface.
 func (s *InmemStore) SetEvent(event *Event) error {
 	key := event.Hex()
 	_, err := s.GetEvent(key)
