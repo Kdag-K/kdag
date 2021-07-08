@@ -29,7 +29,7 @@ func NewLRU(size int, onEvict EvictCallback) *LRU {
 		items:     make(map[interface{}]*list.Element),
 		onEvict:   onEvict,
 	}
-	
+
 	return c
 }
 
@@ -39,10 +39,10 @@ func (c *LRU) Purge() {
 		if c.onEvict != nil {
 			c.onEvict(k, v.Value.(*entry).value)
 		}
-		
+
 		delete(c.items, k)
 	}
-	
+
 	c.evictList.Init()
 }
 
@@ -52,7 +52,7 @@ func (c *LRU) Add(key, value interface{}) bool {
 	if ent, ok := c.items[key]; ok {
 		c.evictList.MoveToFront(ent)
 		ent.Value.(*entry).value = value
-		
+
 		return false
 	}
 
@@ -66,7 +66,7 @@ func (c *LRU) Add(key, value interface{}) bool {
 	if evict {
 		c.removeOldest()
 	}
-	
+
 	return evict
 }
 
@@ -74,10 +74,10 @@ func (c *LRU) Add(key, value interface{}) bool {
 func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
 	if ent, ok := c.items[key]; ok {
 		c.evictList.MoveToFront(ent)
-		
+
 		return ent.Value.(*entry).value, true
 	}
-	
+
 	return
 }
 
@@ -85,7 +85,7 @@ func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
 // or deleting it for being stale.
 func (c *LRU) Contains(key interface{}) (ok bool) {
 	_, ok = c.items[key]
-	
+
 	return ok
 }
 
@@ -114,10 +114,10 @@ func (c *LRU) RemoveOldest() (interface{}, interface{}, bool) {
 	if ent != nil {
 		c.removeElement(ent)
 		kv := ent.Value.(*entry)
-		
+
 		return kv.key, kv.value, true
 	}
-	
+
 	return nil, nil, false
 }
 
@@ -125,10 +125,10 @@ func (c *LRU) RemoveOldest() (interface{}, interface{}, bool) {
 func (c *LRU) GetOldest() (interface{}, interface{}, bool) {
 	if ent := c.evictList.Back(); ent != nil {
 		kv := ent.Value.(*entry)
-		
+
 		return kv.key, kv.value, true
 	}
-	
+
 	return nil, nil, false
 }
 
@@ -140,7 +140,7 @@ func (c *LRU) Keys() []interface{} {
 		keys[i] = ent.Value.(*entry).key
 		i++
 	}
-	
+
 	return keys
 }
 
