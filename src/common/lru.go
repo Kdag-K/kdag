@@ -95,6 +95,7 @@ func (c *LRU) Peek(key interface{}) (value interface{}, ok bool) {
 	if ent, ok := c.items[key]; ok {
 		return ent.Value.(*entry).value, true
 	}
+
 	return nil, ok
 }
 
@@ -103,19 +104,20 @@ func (c *LRU) Peek(key interface{}) (value interface{}, ok bool) {
 func (c *LRU) Remove(key interface{}) bool {
 	if ent, ok := c.items[key]; ok {
 		c.removeElement(ent)
+
 		return true
 	}
+
 	return false
 }
 
 // RemoveOldest removes the oldest item from the cache.
 func (c *LRU) RemoveOldest() (interface{}, interface{}, bool) {
-	ent := c.evictList.Back()
-	if ent != nil {
+	if ent := c.evictList.Back(); ent != nil {
 		c.removeElement(ent)
-		kv := ent.Value.(*entry)
-
-		return kv.key, kv.value, true
+		if kv, ok := ent.Value.(*entry); ok { //nolint:wsl
+			return kv.key, kv.value, true
+		}
 	}
 
 	return nil, nil, false
@@ -124,9 +126,9 @@ func (c *LRU) RemoveOldest() (interface{}, interface{}, bool) {
 // GetOldest returns the oldest entry.
 func (c *LRU) GetOldest() (interface{}, interface{}, bool) {
 	if ent := c.evictList.Back(); ent != nil {
-		kv := ent.Value.(*entry)
-
-		return kv.key, kv.value, true
+		if kv, ok := ent.Value.(*entry); ok {
+			return kv.key, kv.value, true
+		}
 	}
 
 	return nil, nil, false
@@ -151,18 +153,18 @@ func (c *LRU) Len() int {
 
 // removeOldest removes the oldest item from the cache.
 func (c *LRU) removeOldest() {
-	ent := c.evictList.Back()
-	if ent != nil {
+	if ent := c.evictList.Back(); ent != nil {
 		c.removeElement(ent)
 	}
 }
 
-// removeElement is used to remove a given list element from the cache
+// removeElement is used to remove a given list element from the cache.
 func (c *LRU) removeElement(e *list.Element) {
 	c.evictList.Remove(e)
-	kv := e.Value.(*entry)
-	delete(c.items, kv.key)
-	if c.onEvict != nil {
-		c.onEvict(kv.key, kv.value)
+	if kv, ok := e.Value.(*entry); ok {
+		delete(c.items, kv.key)
+		if c.onEvict != nil {
+			c.onEvict(kv.key, kv.value)
+		}
 	}
 }
