@@ -22,4 +22,5 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/ugorji/go/codec v1.2.6
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
+	golang.org/x/tools v0.1.4 // indirect
 )
