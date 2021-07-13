@@ -92,8 +92,10 @@ func (i *InmemTransport) EagerSync(target string, args *EagerSyncRequest, resp *
 	}
 
 	// Copy the result back
-	out := rpcResp.Response.(*EagerSyncResponse)
-	*resp = *out
+	if out, ok := rpcResp.Response.(*EagerSyncResponse); ok {
+		*resp = *out
+	}
+
 	return nil
 }
 
@@ -105,8 +107,10 @@ func (i *InmemTransport) FastForward(target string, args *FastForwardRequest, re
 	}
 
 	// Copy the result back
-	out := rpcResp.Response.(*FastForwardResponse)
-	*resp = *out
+	if out, ok := rpcResp.Response.(*FastForwardResponse); ok {
+		*resp = *out
+	}
+
 	return nil
 }
 
@@ -118,8 +122,10 @@ func (i *InmemTransport) Join(target string, args *JoinRequest, resp *JoinRespon
 	}
 
 	// Copy the result back
-	out := rpcResp.Response.(*JoinResponse)
-	*resp = *out
+	if out, ok := rpcResp.Response.(*JoinResponse); ok {
+		*resp = *out
+	}
+
 	return nil
 }
 
@@ -155,10 +161,11 @@ func (i *InmemTransport) makeRPC(target string, args interface{}, r io.Reader, t
 // Connect is used to connect this transport to another transport for a given
 // peer name. This allows for local routing.
 func (i *InmemTransport) Connect(peer string, t Transport) {
-	trans := t.(*InmemTransport)
-	i.Lock()
-	defer i.Unlock()
-	i.peers[peer] = trans
+	if trans, ok := t.(*InmemTransport); ok {
+		i.Lock()
+		defer i.Unlock()
+		i.peers[peer] = trans
+	}
 }
 
 // Disconnect is used to remove the ability to route to a given peer.
