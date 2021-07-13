@@ -6,6 +6,8 @@ import (
 	"io"
 	"sync"
 	"time"
+
+	"github.com/palantir/stacktrace"
 )
 
 // newInmemAddr returns a new in-memory addr with a randomly generate UUID as
@@ -18,7 +20,7 @@ func newInmemAddr() string {
 func generateUUID() string {
 	buf := make([]byte, 16)
 	if _, err := rand.Read(buf); err != nil {
-		panic(fmt.Errorf("failed to read random bytes: %v", err))
+		panic(stacktrace.NewError("failed to read random bytes: %v", err))
 	}
 
 	return fmt.Sprintf("%08x-%04x-%04x-%04x-%12x",
@@ -127,7 +129,7 @@ func (i *InmemTransport) makeRPC(target string, args interface{}, r io.Reader, t
 	i.RUnlock()
 
 	if !ok {
-		err = fmt.Errorf("failed to connect to peer: %v", target)
+		err = stacktrace.NewError("failed to connect to peer: %v", target)
 		return
 	}
 
@@ -145,7 +147,7 @@ func (i *InmemTransport) makeRPC(target string, args interface{}, r io.Reader, t
 			err = rpcResp.Error
 		}
 	case <-time.After(timeout):
-		err = fmt.Errorf("command timed out")
+		err = stacktrace.NewError("command timed out")
 	}
 	return
 }
