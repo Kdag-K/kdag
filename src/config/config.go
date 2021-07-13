@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	webrtc "github.com/pion/webrtc/v2"
+	"github.com/pion/webrtc/v2"
 	"github.com/sirupsen/logrus"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 
@@ -84,7 +84,7 @@ type Config struct {
 	// with the DefaultServerMux of the http package. It is possible that
 	// another server in the same process is simultaneously using the
 	// DefaultServerMux. In which case, the handlers will be accessible from
-	// both servers. This is usefull when Kdag is used in-memory and expected
+	// both servers. This is useful when Kdag is used in-memory and expected
 	// to use the same endpoint (address:port) as the application's API.
 	ServiceAddr string `mapstructure:"service-listen"`
 
@@ -114,7 +114,7 @@ type Config struct {
 	// EnableFastSync enables the FastSync protocol.
 	EnableFastSync bool `mapstructure:"fast-sync"`
 
-	// Store activates persistant storage.
+	// Store activates persistent storage.
 	Store bool `mapstructure:"store"`
 
 	// DatabaseDir is the directory containing database files.
@@ -124,7 +124,7 @@ type Config struct {
 	CacheSize int `mapstructure:"cache-size"`
 
 	// Bootstrap determines whether or not to load Kdag from an existing
-	// database file. Forces Store, ie. bootstrap only works with a persistant
+	// database file. Forces Store, ie. bootstrap only works with a persistent
 	// database store.
 	Bootstrap bool `mapstructure:"bootstrap"`
 
@@ -173,7 +173,7 @@ type Config struct {
 	// ICE address is the URI of a server providing services for ICE, such as
 	// STUN and TURN. The server should support password-based authentication,
 	// as Babble will try to connect with the username and password provided in
-	// ICEUsername and ICEPassword below. Username adn password can also be
+	// ICEUsername and ICEPassword below. Username and password can also be
 	// empty if the ICE server does not use authentication.
 	// https://developer.mozilla.org/en-US/docs/Web/API/RTCIceServer/urls
 	ICEAddress string `mapstructure:"ice-addr"`
@@ -239,7 +239,7 @@ func NewTestConfig(t testing.TB, level logrus.Level) *Config {
 
 // SetDataDir sets the top-level Kdag directory, and updates the database
 // directory if it is currently set to the default value. If the database
-// directory is not currently the default, it means the user has explicitely set
+// directory is not currently the default, it means the user has explicitly set
 // it to something else, so avoid changing it again here.
 func (c *Config) SetDataDir(dataDir string) {
 	c.DataDir = dataDir
