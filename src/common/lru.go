@@ -161,6 +161,20 @@ func (c *LRU) Len() int {
 	return c.evictList.Len()
 }
 
+// Resize changes the cache size.
+func (c *LRU) Resize(size int) int {
+	diff := c.Len() - size
+	if diff < 0 {
+		diff = 0
+	}
+	for i := 0; i < diff; i++ {
+		c.removeOldest()
+	}
+	c.size = size
+
+	return diff
+}
+
 // removeOldest removes the oldest item from the cache.
 func (c *LRU) removeOldest() {
 	if ent := c.evictList.Back(); ent != nil {
