@@ -2,7 +2,11 @@ package common
 
 // TAKEN FROM HASHICORP LRU.
 
-import "container/list"
+import (
+	"container/list"
+
+	"github.com/palantir/stacktrace"
+)
 
 // EvictCallback is used to get a callback when a cache entry is evicted.
 type EvictCallback func(key interface{}, value interface{})
@@ -23,6 +27,11 @@ type entry struct {
 
 // NewLRU constructs an LRU of the given size.
 func NewLRU(size int, onEvict EvictCallback) *LRU {
+	if size <= 0 {
+		stacktrace.NewError("Must provide a positive size")
+
+		return nil
+	}
 	c := &LRU{
 		size:      size,
 		evictList: list.New(),
