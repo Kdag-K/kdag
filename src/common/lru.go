@@ -4,7 +4,8 @@ package common
 
 import (
 	"container/list"
-	"errors"
+
+	"github.com/palantir/stacktrace"
 )
 
 // EvictCallback is used to get a callback when a cache entry is evicted.
@@ -24,10 +25,10 @@ type entry struct {
 	value interface{}
 }
 
-// NewLRU constructs an LRU of the given size
-func NewLRU(size int, onEvict EvictCallback) (*LRU, error) {
+// NewLRU constructs an LRU of the given size.
+func NewLRU(size int, onEvict EvictCallback) *LRU {
 	if size <= 0 {
-		return nil, errors.New("Must provide a positive size")
+		panic(stacktrace.NewError("Must provide a positive size"))
 	}
 	c := &LRU{
 		size:      size,
@@ -35,7 +36,8 @@ func NewLRU(size int, onEvict EvictCallback) (*LRU, error) {
 		items:     make(map[interface{}]*list.Element),
 		onEvict:   onEvict,
 	}
-	return c, nil
+
+	return c
 }
 
 // Purge is used to completely clear the cache.
@@ -82,6 +84,7 @@ func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
 		if ent.Value.(*entry) == nil {
 			return nil, false
 		}
+
 		return ent.Value.(*entry).value, true
 	}
 
