@@ -15,6 +15,7 @@ require (
 	github.com/palantir/stacktrace v0.0.0-20161112013806-78658fd2d177
 	github.com/pion/datachannel v1.4.14
 	github.com/pion/webrtc/v2 v2.2.0
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
