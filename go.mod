@@ -15,7 +15,7 @@ require (
 	github.com/palantir/stacktrace v0.0.0-20161112013806-78658fd2d177
 	github.com/pion/datachannel v1.4.14
 	github.com/pion/webrtc/v2 v2.2.0
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
@@ -23,5 +23,5 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/ugorji/go/codec v1.2.6
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
-	golang.org/x/tools v0.1.4 // indirect
+	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 )
