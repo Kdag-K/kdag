@@ -19,16 +19,15 @@ function filter() {
             --enable=misspell \
             --enable=golint \
             --exclude=underscores \
-            --exclude-use-default=false\
-            --enable=staticcheck \
-    	      --enable=gocyclo \
-    	      --enable=staticcheck \
-    	      --enable=golint \
-    	      --enable=unused \
-    	      --enable=gotype \
-    	      --enable=gotypex
+            --exclude-use-default=false
     )
-
+#            --enable=staticcheck \
+#    	      --enable=gocyclo \
+#    	      --enable=staticcheck \
+#    	      --enable=golint \
+#    	      --enable=unused \
+#    	      --enable=gotype \
+#    	      --enable=gotypex
 
     if [[ ${#res} -gt "0" ]]; then
         echo -e "${res}"
